@@ -11,8 +11,8 @@
 #include "Encoder.h"
 #include<std_msgs/Empty.h>
 Motor mo0(7,6);//9 8
-Motor mo1(9,8);//4 5
-Motor mo2(4,5);//7 6
+Motor mo1(8,9);//4 5
+Motor mo2(5,4);//7 6
 Motor mo3(10,11);
 
 Encoder enc;
@@ -64,7 +64,6 @@ int v[4]={31,41,25,24};
 
 void setup(){   
 	
-	Encoder::set();
     
 	nh.initNode();
     nh.advertise(pub0);

@@ -81,7 +81,7 @@ class Pole1(smach.State):
     def execute(self,data): 
         rospy.sleep(0.5)
         
-        if self.cnt>=30:
+        if self.cnt>=40:
             return 'next'
         
         if not self.switch:
@@ -114,7 +114,7 @@ class Pole2(smach.State):
     def execute(self,data): 
         rospy.sleep(0.5)
         
-        if self.cnt>=30:
+        if self.cnt>=20:
             return 'next'
         
         if not self.switch:
@@ -147,7 +147,7 @@ class Pole3(smach.State):
     def execute(self,data): 
         rospy.sleep(0.5)
         
-        if self.cnt>=60:
+        if self.cnt>=40:
             return 'next'
         
         if not self.switch:
@@ -188,7 +188,7 @@ class End(smach.State):
             self.Ms.angular.z=0
             self.pub1.publish(self.Ms)
             rospy.loginfo('end')
-            return 'progress'
+            return 'end'
 class main():
     rospy.init_node('robot_order')
     sm=smach.StateMachine(

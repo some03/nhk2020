@@ -104,7 +104,7 @@ void Run::publish(){
 
 
 		//std::cout<<mg.linear.x<<" "<<mg.linear.y<<" "<<mg.linear.z<<std::endl;	
-		std::cout<<nowx<<" "<<nowy<<" "<<nowz<<std::endl;	
+//		std::cout<<nowx<<" "<<nowy<<" "<<nowz<<std::endl;	
 		
 		pos_pub.publish(msg);
 		ord_pub.publish(mg);	
