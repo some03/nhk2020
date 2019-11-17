@@ -42,7 +42,8 @@ class Run{
 Run::Run(){
 	nh.param<double>("kp",kp,0.3);
 	nh.param<double>("r",r,0.1);
-	nh.param<double>("mxspd",mxspd,100);
+	nh.param<double>("mxspd",mxspd,1000);
+	
 
 	enc0=0;
 	enc1=0;
@@ -81,8 +82,8 @@ void Run::autoCb(const std_msgs::Bool::ConstPtr& Mg){
 void Run::publish(){
 		geometry_msgs::Twist mg;
 		geometry_msgs::Twist msg;
-		nowx= 0.35*(-enc0+enc1+enc2-enc3);
-		nowy= 0.35*(enc0+enc1-enc2-enc3);
+		nowx= 0.003*(-enc0+enc1+enc2-enc3);
+		nowy= 0.003*(enc0+enc1-enc2-enc3);
 		nowz=0;
       
 	    mg.linear.x=kp*(x-nowx);
@@ -103,8 +104,8 @@ void Run::publish(){
         else mg.angular.z=std::max(mg.angular.z,-mxspd);
 
 
-		//std::cout<<mg.linear.x<<" "<<mg.linear.y<<" "<<mg.linear.z<<std::endl;	
-//		std::cout<<nowx<<" "<<nowy<<" "<<nowz<<std::endl;	
+		std::cout<<"x"<<mg.linear.x<<" "<<"y"<<mg.linear.y<<" "<<"z"<<mg.linear.z<<std::endl;	
+		std::cout<<nowx<<" "<<nowy<<" "<<nowz<<std::endl;	
 		
 		pos_pub.publish(msg);
 		ord_pub.publish(mg);	

@@ -87,8 +87,8 @@ class Pole1(smach.State):
         if not self.switch:
             return 'emergency'
         else:
-            self.Ms.linear.x=500
-            self.Ms.linear.y=300
+            self.Ms.linear.x=0
+            self.Ms.linear.y=200
             self.Ms.angular.z=0
             self.pub1.publish(self.Ms)
             self.cnt+=1
@@ -114,14 +114,14 @@ class Pole2(smach.State):
     def execute(self,data): 
         rospy.sleep(0.5)
         
-        if self.cnt>=20:
+        if self.cnt>=40:
             return 'next'
         
         if not self.switch:
             return 'emergency'
         else:
-            self.Ms.linear.x=-500
-            self.Ms.linear.y=300
+            self.Ms.linear.x=0
+            self.Ms.linear.y=-200
             self.Ms.angular.z=0
             self.pub1.publish(self.Ms)
             self.cnt+=1
@@ -154,7 +154,7 @@ class Pole3(smach.State):
             return 'emergency'
         else:
             self.Ms.linear.x=0
-            self.Ms.linear.y=-600
+            self.Ms.linear.y=-100
             self.Ms.angular.z=0
             self.pub1.publish(self.Ms)
             self.cnt+=1
@@ -184,7 +184,7 @@ class End(smach.State):
             return 'emergency'
         else:
             self.Ms.linear.x=0
-            self.Ms.linear.y=0
+            self.Ms.linear.y=-100
             self.Ms.angular.z=0
             self.pub1.publish(self.Ms)
             rospy.loginfo('end')

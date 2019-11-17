@@ -11,7 +11,7 @@
 #include "Encoder.h"
 #include<std_msgs/Empty.h>
 Motor mo0(7,6);//9 8
-Motor mo1(8,9);//4 5
+Motor mo1(9,8);//4 5
 Motor mo2(5,4);//7 6
 Motor mo3(10,11);
 
