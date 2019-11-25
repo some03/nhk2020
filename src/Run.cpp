@@ -86,7 +86,7 @@ void Run::publish(){
 		nowy= 0.003*(enc0+enc1-enc2-enc3);
 		nowz=0;
       
-	    mg.linear.x=kp*(x-nowx);
+		mg.linear.x=kp*(x-nowx);
 		mg.linear.y=kp*(y-nowy);
 		mg.angular.z=kp*(z-nowz);
 
