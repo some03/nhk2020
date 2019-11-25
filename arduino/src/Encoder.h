@@ -55,9 +55,9 @@ Encoder::Encoder(){
 
 void Encoder::Encm0(){
      
-  M0encB=digitalRead(b[0]);
-  if(M0encB)--M0encvalue;
-  else ++M0encvalue;  
+  	M0encB=digitalRead(b[0]);
+  	if(M0encB)--M0encvalue;
+  	else ++M0encvalue;  
 		
 }
 
@@ -80,10 +80,10 @@ void Encoder::Encm3(){
 }
 
 void Encoder::set(){
-		M0encvalue=0;
-		M1encvalue=0;
-		M2encvalue=0;
-		M3encvalue=0;
+	M0encvalue=0;
+	M1encvalue=0;
+	M2encvalue=0;
+	M3encvalue=0;
 }
 #endif
 
