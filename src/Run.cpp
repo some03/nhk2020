@@ -13,7 +13,7 @@ class Run{
 		bool go;
 	private:
 		ros::NodeHandle nh;
-        void vsub(const geometry_msgs::Twist::ConstPtr&msg);
+        	void vsub(const geometry_msgs::Twist::ConstPtr&msg);
 		ros::Subscriber ord_sub=nh.subscribe("cmd_ord",10,&Run::vsub,this);
 		ros::Publisher ord_pub=nh.advertise<geometry_msgs::Twist>("cmd_vel",10);
 		ros::Publisher pos_pub=nh.advertise<geometry_msgs::Twist>("cmd_pos",10);
@@ -25,7 +25,7 @@ class Run{
 		void m3(const std_msgs::Int32::ConstPtr& msg);
 
 
-        ros::Subscriber e0sub=nh.subscribe<std_msgs::Int32>("enc0",10,&Run::m0,this);
+        	ros::Subscriber e0sub=nh.subscribe<std_msgs::Int32>("enc0",10,&Run::m0,this);
 		ros::Subscriber e1sub=nh.subscribe<std_msgs::Int32>("enc1",10,&Run::m1,this);
 		ros::Subscriber e2sub=nh.subscribe<std_msgs::Int32>("enc2",10,&Run::m2,this);
 		ros::Subscriber e3sub=nh.subscribe<std_msgs::Int32>("enc3",10,&Run::m3,this);
@@ -95,13 +95,13 @@ void Run::publish(){
 		msg.angular.z=nowz;
 	
 		if(mg.linear.x>=0)mg.linear.x=std::min(mg.linear.x,mxspd);
-        else mg.linear.x=std::max(mg.linear.x,-mxspd);
+        	else mg.linear.x=std::max(mg.linear.x,-mxspd);
 
-        if(mg.linear.y>=0)mg.linear.y=std::min(mg.linear.y,mxspd);
-        else mg.linear.y=std::max(mg.linear.y,-mxspd);
+        	if(mg.linear.y>=0)mg.linear.y=std::min(mg.linear.y,mxspd);
+        	else mg.linear.y=std::max(mg.linear.y,-mxspd);
 
-        if(mg.linear.z>=0)mg.angular.z=std::min(mg.angular.z,mxspd);
-        else mg.angular.z=std::max(mg.angular.z,-mxspd);
+        	if(mg.linear.z>=0)mg.angular.z=std::min(mg.angular.z,mxspd);
+        	else mg.angular.z=std::max(mg.angular.z,-mxspd);
 
 
 		std::cout<<"x"<<mg.linear.x<<" "<<"y"<<mg.linear.y<<" "<<"z"<<mg.linear.z<<std::endl;	
