@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import rospy
+import actionlib
+from nhk_2020.msg import *
 import smach
 import smach_ros
 from std_msgs.msg import Float32
@@ -8,7 +10,21 @@ from std_msgs.msg import Int32
 from std_msgs.msg import Bool
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Empty
-import actionlib
+
+def Client(x,y):
+   client=actionlib.SimpleActionClient('Action',taskAction)
+   client.wait_for_server()
+   goal=taskGoal()
+
+   goal.Goal.linear.x=x
+   goal.Goal.linear.y=y
+
+
+   client.send_goal(goal)
+   client.wait_for_result()
+   result=client.get_result()
+
+
 
 class Switch(smach.State):
     def __init__(self):
@@ -62,125 +78,105 @@ class Set(smach.State):
         self.auto_pub.publish(self.Mg)
         return 'init'
 
+
 class Pole1(smach.State):
     def __init__(self):
         smach.State.__init__(self,outcomes=['progress','next','emergency'])
-        self.pub1=rospy.Publisher("cmd_ord",Twist)
-
         self.sw_sub=rospy.Subscriber('switch',Bool,self.swCb)
+        self.client=actionlib.SimpleActionClient('Action',taskAction)
         self.switch=True
-        self.Ms=Twist()
+        self.action=False
+        self.result=False
 
-        self.cnt=0;
-        
         
     def swCb(self,msg):
         self.switch=msg.data
-    def execute(self,data): 
+    
+    def execute(self,data):
         rospy.sleep(0.5)
-        
-        if self.cnt>=30:
-            return 'next'
         
         if not self.switch:
             return 'emergency'
         else:
-            self.Ms.linear.x=200
-            self.Ms.linear.y=300
-            self.Ms.angular.z=0
-            self.pub1.publish(self.Ms)
-            self.cnt+=1
-            rospy.loginfo('pole1 state')
-            return 'progress'
+            if not self.action:
+                self.client.wait_for_server()
+                goal=taskGoal()
 
+                goal.Goal.linear.x=200
+                goal.Goal.linear.y=100
+                self.client.send_goal(goal)
+                self.action=True
+                return 'progress'
+            if not self.result and self.action:
+                self.result=self.client.get_result()
+                rospy.loginfo(self.result)
+                return 'progress'
+            if self.result and self.action:
+                    return 'next'
 class Pole2(smach.State):
     def __init__(self):
         smach.State.__init__(self,outcomes=['progress','next','emergency'])
-        self.pub1=rospy.Publisher("cmd_ord",Twist)
-
         self.sw_sub=rospy.Subscriber('switch',Bool,self.swCb)
         self.switch=True
-        self.Ms=Twist()
-
-        self.cnt=0;
-        
         
     def swCb(self,msg):
         self.switch=msg.data
-    def execute(self,data): 
+    def execute(self,data):
         rospy.sleep(0.5)
-        
-        if self.cnt>=30:
-            return 'next'
-        
+
         if not self.switch:
             return 'emergency'
         else:
-            self.Ms.linear.x=-200
-            self.Ms.linear.y=300
-            self.Ms.angular.z=0
-            self.pub1.publish(self.Ms)
-            self.cnt+=1
-            rospy.loginfo('pole2 state')
-            return 'progress'
+            if Client.result:
+                return 'next'
+            else:
+                Client(-100,200)
+                rospy.loginfo('pole2 state')
+                return 'progress'
 
 class Pole3(smach.State):
     def __init__(self):
         smach.State.__init__(self,outcomes=['progress','next','emergency'])
-        self.pub1=rospy.Publisher("cmd_ord",Twist)
-
         self.sw_sub=rospy.Subscriber('switch',Bool,self.swCb)
         self.switch=True
-        self.Ms=Twist()
-
-        self.cnt=0;
-        
         
     def swCb(self,msg):
         self.switch=msg.data
-    def execute(self,data): 
+    def execute(self,data):
         rospy.sleep(0.5)
-        
-        if self.cnt>=40:
-            return 'next'
-        
+
         if not self.switch:
             return 'emergency'
         else:
-            self.Ms.linear.x=200
-            self.Ms.linear.y=300
-            self.Ms.angular.z=0
-            self.pub1.publish(self.Ms)
-            self.cnt+=1
-            rospy.loginfo('pole3 state')
-            return 'progress'
+            if Client.result:
+                return 'next'
+            else:
+                Client(100,300)
+                rospy.loginfo('pole3 state')
+                return 'progress'
+
 
 class End(smach.State):
     def __init__(self):
-        smach.State.__init__(self,outcomes=['end','emergency'])
-        self.pub1=rospy.Publisher("cmd_ord",Twist)
-
+        smach.State.__init__(self,outcomes=['progress','end','emergency'])
         self.sw_sub=rospy.Subscriber('switch',Bool,self.swCb)
         self.switch=True
-        self.Ms=Twist()
-
-        
         
     def swCb(self,msg):
         self.switch=msg.data
-    def execute(self,data): 
+    def execute(self,data):
         rospy.sleep(0.5)
-        
-        
+
         if not self.switch:
             return 'emergency'
         else:
-            self.Ms.linear.x=200
-            self.Ms.linear.y=0
-            self.Ms.angular.z=0
-            self.pub1.publish(self.Ms)
-            rospy.loginfo('end')
-            return 'end'
+            if Client.result:
+                return 'end'
+            else:
+                Client(100,0)
+                rospy.loginfo('end')
+                return 'progress'
+
 class main():
     rospy.init_node('robot_order')
     sm=smach.StateMachine(
@@ -209,7 +205,8 @@ class main():
                                              'emergency':'SWITCH'})
 
         smach.StateMachine.add('END',End(),
-                                transitions={'end':'END',
+                                transitions={'end':'outcomes',
+                                             'progress':'END',
                                              'emergency':'SWITCH'})
         sis=smach_ros.IntrospectionServer('server_name',sm,'/SM_ROOT')
         sis.start()

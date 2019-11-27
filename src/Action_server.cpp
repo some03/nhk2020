@@ -14,6 +14,7 @@ class taskAction{
 
 		nhk_2020::taskFeedback feedback_;
 		nhk_2020::taskResult result_;
+   		ros::Publisher pub=nh.advertise<geometry_msgs::Twist>("cmd_ord",10);
 		void posCb(const geometry_msgs::Twist::ConstPtr&mg);
  		ros::Subscriber pSb=nh.subscribe<geometry_msgs::Twist>("cmd_pos",10,&taskAction::posCb,this);
 
@@ -23,6 +24,7 @@ class taskAction{
 				Task(nh,name,boost::bind(&taskAction::exeCb,this,_1),false),
 				order_action(name){
 		 			Task.start();
+					std::cout<<"start"<<std::endl;
 		 		}
 		~taskAction(void){}
 		void exeCb(const nhk_2020::taskGoalConstPtr &goal);
@@ -51,6 +53,11 @@ void taskAction::exeCb(const nhk_2020::taskGoalConstPtr &goal){
         Dx=x;
 		Dy=y;
 		Dz=z;
+		geometry_msgs::Twist Ms;
+		
+		Ms.linear.x=Dx;
+		Ms.linear.y=Dy;
+
 	    std::cout<<Dx<<" "<<Dy<<" "<<Dz<<std::endl;
 	while(Dx>limit || Dy>limit){
 
@@ -60,13 +67,13 @@ void taskAction::exeCb(const nhk_2020::taskGoalConstPtr &goal){
 		   	break;
 		}
 		feedback_.passing=false;
-	
+		pub.publish(Ms);	
     	Dx=x-sqrt(nowx*nowx);
 		Dy=y-sqrt(nowy*nowy);
 		Dz=z-sqrt(nowz*nowz);
 		
 		loop_rate.sleep();
-		std::cout<<"prompt"<<std::endl;
+		std::cout<<"execute"<<std::endl;
 	}
 
 	if(success){
@@ -81,7 +88,7 @@ void taskAction::exeCb(const nhk_2020::taskGoalConstPtr &goal){
 }	
 
 int main(int argc,char** argv){
-		ros::init(argc,argv,"Action_server");
+		ros::init(argc,argv,"Action");
 
 		taskAction task(ros::this_node::getName());
 		ros::spin();
