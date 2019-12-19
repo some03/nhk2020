@@ -220,9 +220,10 @@ target_link_libraries(Run ${catkin_LIBRARIES})
 add_executable(Omni src/Omuni.cpp)
 target_link_libraries(Omni ${catkin_LIBRARIES})
 
+add_executable(action  src/Action_server.cpp)
+target_link_libraries(action ${catkin_LIBRARIES})
 
-add_executable(Action_server  src/Action_server.cpp)
-target_link_libraries(Action_server ${catkin_LIBRARIES})
-
+add_executable(Test_Run  src/test.cpp)
+target_link_libraries(Test_Run ${catkin_LIBRARIES})
 
 

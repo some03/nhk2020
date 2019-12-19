@@ -59,7 +59,7 @@ void taskAction::exeCb(const nhk_2020::taskGoalConstPtr &goal){
 		Ms.linear.y=Dy;
 
 	    std::cout<<Dx<<" "<<Dy<<" "<<Dz<<std::endl;
-	while(Dx>limit || Dy>limit){
+	while(Dx>limit || Dy>limit||Dx<-limit||Dy<-limit){
 
     	if(Task.isPreemptRequested()||!ros::ok()){
 		   	Task.setPreempted();
@@ -68,9 +68,9 @@ void taskAction::exeCb(const nhk_2020::taskGoalConstPtr &goal){
 		}
 		feedback_.passing=false;
 		pub.publish(Ms);	
-    	Dx=x-sqrt(nowx*nowx);
-		Dy=y-sqrt(nowy*nowy);
-		Dz=z-sqrt(nowz*nowz);
+    	Dx=sqrt(pow(x-nowx,2.0));
+		Dy=sqrt(pow(y-nowy,2.0));
+		Dz=sqrt(pow(z-nowz,2.0));
 		
 		loop_rate.sleep();
 		std::cout<<"execute"<<std::endl;
@@ -88,7 +88,7 @@ void taskAction::exeCb(const nhk_2020::taskGoalConstPtr &goal){
 }	
 
 int main(int argc,char** argv){
-		ros::init(argc,argv,"Action");
+		ros::init(argc,argv,"action");
 
 		taskAction task(ros::this_node::getName());
 		ros::spin();

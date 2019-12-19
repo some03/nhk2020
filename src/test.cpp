@@ -5,15 +5,21 @@
 #include<std_msgs/Int32.h>
 #include<std_msgs/Bool.h>
 
+#define PI  3.14159265359 
+#define GR  1.63636363636
+#define PULSE 2000.0
+#define R 50.0
 class Run{
 	public:
 		Run();
 		void publish();
 		void suspend();
+        void velocity(long long Enc0,long long Enc1,long long Enc2,long long Enc3);
+
 		bool go;
 	private:
 		ros::NodeHandle nh;
-        	void vsub(const geometry_msgs::Twist::ConstPtr&msg);
+        void vsub(const geometry_msgs::Twist::ConstPtr&msg);
 		ros::Subscriber ord_sub=nh.subscribe("cmd_ord",10,&Run::vsub,this);
 		ros::Publisher ord_pub=nh.advertise<geometry_msgs::Twist>("cmd_vel",10);
 		ros::Publisher pos_pub=nh.advertise<geometry_msgs::Twist>("cmd_pos",10);
@@ -33,11 +39,15 @@ class Run{
 		long long enc1;
 		long long enc2;
 		long long enc3;
-
+        
+        double v[4]={0,1,2,3};
+        double oldEnc[4]={0,1,2,3};
+        double time;
 		
 		double nowx,nowy,nowz;
 		double kp,r,mxspd;
 		double x,y,z;
+        double Vx,Vy,theta;
 };
 Run::Run(){
 	nh.param<double>("kp",kp,0.01);
@@ -50,6 +60,13 @@ Run::Run(){
 	enc2=0;
 	enc3=0;
 
+    nowx=0;
+    nowy=0;
+    nowz=0;
+
+    for(int i=0;i<4;i++)v[i]=0,oldEnc[i]=0;
+    
+    time=0.0;
 	x=0,y=0,z=0;
 
 	go=false;
@@ -79,13 +96,38 @@ void Run::autoCb(const std_msgs::Bool::ConstPtr& Mg){
 		go=Mg->data;
 }
 
+void Run::velocity(long long Enc0,long long Enc1,long long Enc2,long long Enc3){
+
+    v[0]=((Enc0-oldEnc[0])/(PULSE*GR*time))*2*PI;
+    v[1]=((Enc1-oldEnc[1])/(PULSE*GR*time))*2*PI;
+    v[2]=((Enc2-oldEnc[2])/(PULSE*GR*time))*2*PI;
+    v[3]=((Enc3-oldEnc[3])/(PULSE*GR*time))*2*PI;
+
+    oldEnc[0]=Enc0;
+    oldEnc[1]=Enc1;
+    oldEnc[2]=Enc2;
+    oldEnc[3]=Enc3;
+
+    time+=0.2;
+
+    std::cout<<"time"<<time<<" "<<v[0]<<" "<<v[1]<<" "<<v[2]<<" "<<v[3]<<std::endl;
+}
+
 void Run::publish(){
 		geometry_msgs::Twist mg;
 		geometry_msgs::Twist msg;
-		nowx= 0.003*(-enc0+enc1+enc2-enc3);
-		nowy= 0.003*(enc0+enc1-enc2-enc3);
+
+
+        velocity(enc0,enc1,enc2,enc3);
+
+        Vx=0.35*(-v[0]+v[1]+v[2]-v[3]);
+        Vy=0.35*(v[0]+v[1]-v[2]-v[3]);
+        theta=0;
+        
+		nowx+=Vx;
+		nowy+=Vy;
 		nowz=0;
-      
+         
 		mg.linear.x=kp*(x-nowx);
 		mg.linear.y=kp*(y-nowy);
 		mg.angular.z=kp*(z-nowz);
@@ -96,7 +138,6 @@ void Run::publish(){
 	
 		if(mg.linear.x>=0)mg.linear.x=std::min(mg.linear.x,mxspd);
         else mg.linear.x=std::max(mg.linear.x,-mxspd);
-
 
         if(mg.linear.y>=0)mg.linear.y=std::min(mg.linear.y,mxspd);
         else mg.linear.y=std::max(mg.linear.y,-mxspd);
@@ -116,7 +157,7 @@ void Run::suspend(){
 }
 
 int main(int argc,char**argv){
-		ros::init(argc,argv,"Run");
+		ros::init(argc,argv,"Test_Run");
 		Run run;
 		ros::Rate loop_rate(5);
 		while(ros::ok()){
@@ -127,5 +168,4 @@ int main(int argc,char**argv){
 		}
 		return 0;
 }
-
 

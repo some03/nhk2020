@@ -10,8 +10,8 @@ class Encoder{
         static int a[];
         static int b[];
         
-	static volatile int M0encB;
-	static volatile long long M0encvalue;
+	    static volatile int M0encB;
+	    static volatile long long M0encvalue;
         static volatile int M1encB;
         static volatile long long M1encvalue;
         static volatile int M2encB;
@@ -21,13 +21,12 @@ class Encoder{
         static void Encm0();
         static void Encm1();
         static void Encm2();
-	static void Encm3();
-	static void set();
+	    static void Encm3();
+	    static void set();
 
 };
 	int Encoder::b[4]={29,35,37,30};
-    	int Encoder::a[4]={18,19,20,21};
-	
+    int Encoder::a[4]={18,19,20,21};
 
 
 	volatile int Encoder::M0encB;
@@ -69,13 +68,13 @@ void Encoder::Encm1(){
 }
 void Encoder::Encm2(){
 	M2encB=digitalRead(b[2]);
-    	if(M2encB)--M2encvalue;
+    if(M2encB)--M2encvalue;
 	else ++M2encvalue;
 }
 
 void Encoder::Encm3(){
 	M3encB=digitalRead(b[3]);
-    	if(M3encB)--M3encvalue;
+    if(M3encB)--M3encvalue;
 	else ++M3encvalue;
 }
 
