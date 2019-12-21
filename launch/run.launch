@@ -1,7 +1,7 @@
 <launch>
  	<node pkg="nhk_2020" type="Run" name="Run" output="screen">
     </node>
-  	    <arg name="kp" default="0.01"/>
+  	    <arg name="kp" default="0.1"/>
   	    <rosparam param="kp" subst_value="True">$(arg kp)</rosparam>
     <node pkg="nhk_2020" type="Omni" name="Omni" output="screen">
   	</node>

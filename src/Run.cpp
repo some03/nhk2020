@@ -40,7 +40,7 @@ class Run{
 		double x,y,z;
 };
 Run::Run(){
-	nh.param<double>("kp",kp,0.01);
+	nh.param<double>("kp",kp,0.1);
 	nh.param<double>("r",r,0.1);
 	nh.param<double>("mxspd",mxspd,100);
 	

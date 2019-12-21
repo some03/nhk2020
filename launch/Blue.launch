@@ -1,5 +1,5 @@
 <launch>
-    <arg name="kp" default="0.01"/>
+    <arg name="kp" default="0.1"/>
     <rosparam  param="kp" subst_value="True">$(arg kp)</rosparam>
 
 

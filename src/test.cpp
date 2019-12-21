@@ -10,10 +10,10 @@
 #define PULSE 2000.0
 #define R 50.0
 class Run{
-	public:
-		Run();
-		void publish();
-		void suspend();
+    public:
+        Run();
+        void publish();
+        void suspend();
         void velocity(long long Enc0,long long Enc1,long long Enc2,long long Enc3);
 
 		bool go;

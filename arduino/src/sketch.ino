@@ -10,10 +10,10 @@
 #include "Motor.h"
 #include "Encoder.h"
 #include<std_msgs/Empty.h>
-Motor mo0(7,6);//9 8
+Motor mo0(10,11);//9 8
 Motor mo1(9,8);//4 5
-Motor mo2(5,4);//7 6
-Motor mo3(10,11);
+Motor mo2(3,2);//7 6
+Motor mo3(6,7);
 
 Encoder enc;
 
@@ -66,9 +66,9 @@ void setup(){
 	
     
 	nh.initNode();
-    	nh.advertise(pub0);
-    	nh.advertise(pub1);
-    	nh.advertise(pub2);
+    nh.advertise(pub0);
+    nh.advertise(pub1);
+    nh.advertise(pub2);
 	nh.advertise(pub3);
 
 	nh.subscribe(m0s);
