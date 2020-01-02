@@ -226,4 +226,7 @@ target_link_libraries(action ${catkin_LIBRARIES})
 add_executable(Test_Run  src/test.cpp)
 target_link_libraries(Test_Run ${catkin_LIBRARIES})
 
+add_executable(infomation  src/info.cpp)
+target_link_libraries(infomation ${catkin_LIBRARIES})
+
 

@@ -14,7 +14,6 @@ class Run{
         Run();
         void publish();
         void suspend();
-        void velocity(long long Enc0,long long Enc1,long long Enc2,long long Enc3);
 
 		bool go;
 	private:
@@ -91,34 +90,31 @@ void Run::vsub(const geometry_msgs::Twist::ConstPtr& Ms){
 		x=Ms->linear.x;
 		y=Ms->linear.y;
 		z=Ms->angular.z;
+        std::cout<<x<<std::endl;
 }
 void Run::autoCb(const std_msgs::Bool::ConstPtr& Mg){
 		go=Mg->data;
 }
 
-void Run::velocity(long long Enc0,long long Enc1,long long Enc2,long long Enc3){
-
-    v[0]=((Enc0-oldEnc[0])/(PULSE*GR*time))*2*PI;
-    v[1]=((Enc1-oldEnc[1])/(PULSE*GR*time))*2*PI;
-    v[2]=((Enc2-oldEnc[2])/(PULSE*GR*time))*2*PI;
-    v[3]=((Enc3-oldEnc[3])/(PULSE*GR*time))*2*PI;
-
-    oldEnc[0]=Enc0;
-    oldEnc[1]=Enc1;
-    oldEnc[2]=Enc2;
-    oldEnc[3]=Enc3;
-
-    time+=0.2;
-
-    std::cout<<"time"<<time<<" "<<v[0]<<" "<<v[1]<<" "<<v[2]<<" "<<v[3]<<std::endl;
-}
 
 void Run::publish(){
 		geometry_msgs::Twist mg;
 		geometry_msgs::Twist msg;
 
+        v[0]=((enc0-oldEnc[0])/(PULSE*GR*time))*2*PI;
+        v[1]=((enc1-oldEnc[1])/(PULSE*GR*time))*2*PI;
+        v[2]=((enc2-oldEnc[2])/(PULSE*GR*time))*2*PI;
+        v[3]=((enc3-oldEnc[3])/(PULSE*GR*time))*2*PI;
 
-        velocity(enc0,enc1,enc2,enc3);
+        oldEnc[0]=enc0;
+        oldEnc[1]=enc1;
+        oldEnc[2]=enc2;
+        oldEnc[3]=enc3;
+
+        time+=0.2;
+
+    std::cout<<"time"<<time<<" "<<v[0]<<" "<<v[1]<<" "<<v[2]<<" "<<v[3]<<std::endl;
+
 
         Vx=0.35*(-v[0]+v[1]+v[2]-v[3]);
         Vy=0.35*(v[0]+v[1]-v[2]-v[3]);

@@ -5,6 +5,4 @@
   	    <rosparam param="kp" subst_value="True">$(arg kp)</rosparam>
     <node pkg="nhk_2020" type="Omni" name="Omni" output="screen">
   	</node>
-   	<node pkg="nhk_2020" type="State.py" name="robot_order" output="screen">
-  	</node>
  </launch> 

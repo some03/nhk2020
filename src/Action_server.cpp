@@ -28,17 +28,17 @@ class taskAction{
 		 		}
 		~taskAction(void){}
 		void exeCb(const nhk_2020::taskGoalConstPtr &goal);
-		double nowx=0,nowy=0,nowz=0;
+		double nowx=1,nowy=1,nowz=1;
 		double x=0,y=0,z=0;
 		double Dx=0,Dy=0,Dz=0;
-		int limit=50;
+		int limit=1700;
 
 };
 void taskAction::posCb(const geometry_msgs::Twist::ConstPtr&msg){
  		nowx=msg->linear.x;                  
  		nowy=msg->linear.y;
- 		nowz=msg->linear.z;                  
-		std::cout<<nowx<<std::endl;
+ 		nowz=msg->angular.z;                  
+		std::cout<<"pos"<<" "<<nowx<<" "<<nowy<<std::endl;
  }
 
 void taskAction::exeCb(const nhk_2020::taskGoalConstPtr &goal){
@@ -57,8 +57,9 @@ void taskAction::exeCb(const nhk_2020::taskGoalConstPtr &goal){
 		
 		Ms.linear.x=Dx;
 		Ms.linear.y=Dy;
+        Ms.angular.z=Dz;
 
-	    std::cout<<Dx<<" "<<Dy<<" "<<Dz<<std::endl;
+	    //std::cout<<Dx<<" "<<Dy<<" "<<Dz<<std::endl;
 	while(Dx>limit || Dy>limit||Dx<-limit||Dy<-limit){
 
     	if(Task.isPreemptRequested()||!ros::ok()){
@@ -68,9 +69,11 @@ void taskAction::exeCb(const nhk_2020::taskGoalConstPtr &goal){
 		}
 		feedback_.passing=false;
 		pub.publish(Ms);	
-    	Dx=sqrt(pow(x-nowx,2.0));
-		Dy=sqrt(pow(y-nowy,2.0));
-		Dz=sqrt(pow(z-nowz,2.0));
+    	Dx=sqrt(pow(x-nowx,2));
+		Dy=sqrt(pow(y-nowy,2));
+		Dz=0;//(z-nowz);
+
+        std::cout<<Dx<<Dy<<Dz<<std::endl;
 		
 		loop_rate.sleep();
 		std::cout<<"execute"<<std::endl;
@@ -82,7 +85,7 @@ void taskAction::exeCb(const nhk_2020::taskGoalConstPtr &goal){
 			nowx=0;
 			nowy=0;
 			std::cout<<"true"<<std::endl;
-			loop_rate.sleep();
+            loop_rate.sleep();
 			Task.setSucceeded(result_);
 	}
 }	

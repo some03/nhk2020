@@ -19,6 +19,8 @@ class Run{
 		ros::Publisher pos_pub=nh.advertise<geometry_msgs::Twist>("cmd_pos",10);
  		void autoCb(const std_msgs::Bool::ConstPtr& Mg);
  		ros::Subscriber auto_sub=nh.subscribe("Go",10,&Run::autoCb,this); 		
+        void imuCb(const geometry_msgs::Twist::ConstPtr&imuMsg);
+        ros::Subscriber imu_sub=nh.subscribe("imu",10,&Run::imuCb,this);
 		void m0(const std_msgs::Int32::ConstPtr& msg);
 		void m1(const std_msgs::Int32::ConstPtr& msg);
 		void m2(const std_msgs::Int32::ConstPtr& msg);
@@ -38,11 +40,12 @@ class Run{
 		double nowx,nowy,nowz;
 		double kp,r,mxspd;
 		double x,y,z;
+        double rad;
 };
 Run::Run(){
-	nh.param<double>("kp",kp,0.1);
-	nh.param<double>("r",r,0.1);
-	nh.param<double>("mxspd",mxspd,100);
+	nh.param<double>("kp",kp,0.07);
+	nh.param<double>("r",r,1);
+	nh.param<double>("mxspd",mxspd,1000);
 	
 
 	enc0=0;
@@ -70,6 +73,10 @@ void Run::m2(const std_msgs::Int32::ConstPtr& msg){
 void Run::m3(const std_msgs::Int32::ConstPtr& msg){
 		enc3=msg->data;
 }
+
+void Run::imuCb(const geometry_msgs::Twist::ConstPtr& imuMsg){
+        rad=imuMsg->angular.z;
+}
 void Run::vsub(const geometry_msgs::Twist::ConstPtr& Ms){
 		x=Ms->linear.x;
 		y=Ms->linear.y;
@@ -82,13 +89,13 @@ void Run::autoCb(const std_msgs::Bool::ConstPtr& Mg){
 void Run::publish(){
 		geometry_msgs::Twist mg;
 		geometry_msgs::Twist msg;
-		nowx= 0.003*(-enc0+enc1+enc2-enc3);
-		nowy= 0.003*(enc0+enc1-enc2-enc3);
-		nowz=0;
+		nowx= 0.01*(-enc0+enc1+enc2-enc3);
+		nowy= 0.01*(enc0+enc1-enc2-enc3);
+		nowz=r*rad;
       
 		mg.linear.x=kp*(x-nowx);
 		mg.linear.y=kp*(y-nowy);
-		mg.angular.z=kp*(z-nowz);
+		mg.angular.z=(z-nowz);
 
 		msg.linear.x=nowx;
 		msg.linear.y=nowy;
@@ -105,7 +112,7 @@ void Run::publish(){
         else mg.angular.z=std::max(mg.angular.z,-mxspd);
 
 
-		std::cout<<"x"<<mg.linear.x<<" "<<"y"<<mg.linear.y<<" "<<"z"<<mg.linear.z<<std::endl;	
+		std::cout<<"x"<<mg.linear.x<<" "<<"y"<<mg.linear.y<<" "<<"z"<<mg.angular.z<<std::endl;	
 		std::cout<<nowx<<" "<<nowy<<" "<<nowz<<std::endl;	
 		
 		pos_pub.publish(msg);
@@ -113,7 +120,9 @@ void Run::publish(){
 
 }
 void Run::suspend(){
+    std::cout<<"aa"<<std::endl;
 }
+
 
 int main(int argc,char**argv){
 		ros::init(argc,argv,"Run");

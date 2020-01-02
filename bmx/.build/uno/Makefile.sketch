@@ -1,0 +1,14 @@
+
+
+
+
+
+.build/uno/src/Bmx055.cpp : src/Bmx055.ino
+	@mkdir -p .build/uno/src
+	@echo [93msrc/Bmx055.ino[0m
+	@/usr/local/bin/ino preproc  -o $@ $^
+
+
+all : .build/uno/src/Bmx055.cpp
+	@true
+

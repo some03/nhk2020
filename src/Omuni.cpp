@@ -18,7 +18,7 @@ class Omni{
 			ros::Subscriber cmdsub=nh.subscribe<geometry_msgs::Twist>("cmd_vel",10,&Omni::cmdcb,this);
 
 			void mtgo(int num,float speed);
-			float r=0.03;
+			float r=150;
 			float limit=150;
 };
 void Omni::mtgo(int num ,float speed){
@@ -36,10 +36,10 @@ void Omni::cmdcb(const geometry_msgs::Twist::ConstPtr& mg){
 		float y=linear.y;
 		float z=angular.z;
 		float m[4];
-		m[0]=-sqrt(2)/2*x+sqrt(2)/2*y+z;
-		m[1]=sqrt(2)/2*x+sqrt(2)/2*y+z;
-		m[2]=sqrt(2)/2*x-sqrt(2)/2*y+z;
-		m[3]=-sqrt(2)/2*x-sqrt(2)/2*y+z;
+		m[0]=-sqrt(2)/2*x+sqrt(2)/2*y+r*z;
+		m[1]=sqrt(2)/2*x+sqrt(2)/2*y+r*z;
+		m[2]=sqrt(2)/2*x-sqrt(2)/2*y+r*z;
+		m[3]=-sqrt(2)/2*x-sqrt(2)/2*y+r*z;
 
 		//m[0]*=10,m[1]*=10,m[2]*=10;
 
