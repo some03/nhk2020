@@ -2,8 +2,4 @@
     <node pkg="rosserial_python" type="serial_node.py" name="PS3">
         <param name="port" value="/dev/ttyACM0"/>
     </node>
-
-    <node pkg="rosserial_python" type="serial_node.py" name="reg_arduino">
-        <param name="port" value="/dev/ttyACM1" />
-    </node>
 </launch>

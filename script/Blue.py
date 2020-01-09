@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-
+#355.3mm 28.1 x4.4
 import math
 import rospy
 import actionlib
@@ -15,26 +15,27 @@ from std_msgs.msg import Empty
 class Distance():
     count=2
     def Count(self):
-        Distance.count-=0.5
+        Distance.count-=1
         return Distance.count
 class Way_Back():
     count=2
     def Count(self):
-        Way_Back.count-=0.5
+        Way_Back.count-=1
         return Way_Back.count
 
 class Switch(smach.State):
     def __init__(self):
         smach.State.__init__(self,outcomes=['auto','manual'])
         self.sw_sub=rospy.Subscriber('switch',Bool,self.swcb)
-        self.ord_sub=rospy.Subscriber('order',Twist,self.ordcb)
+        #self.ord_sub=rospy.Subscriber('order',Twist,self.ordcb)
         self.cmd_pub=rospy.Publisher("cmd_vel",Twist)
         self.switch=False
         self.x=0
         self.y=0
         self.z=0
+        self.count=0
         self.mg=Twist()
-        self.auto_pub=rospy.Publisher('Go',Bool)
+        self.auto_pub=rospy.Publisher('manual',Bool)
 
     def swcb(self,msg):
         self.switch=msg.data
@@ -45,18 +46,15 @@ class Switch(smach.State):
     
     def execute(self,data):
         rospy.sleep(0.1)
-        if self.switch:
+        if  self.switch:
+            self.Mg=True
+            self.auto_pub.publish(self.Mg)
             return 'auto' 
         else:
             rospy.loginfo('manual state')
             
             self.Mg=False
             self.auto_pub.publish(self.Mg)
-            self.mg.linear.x=self.x
-            self.mg.linear.y=self.y
-            self.mg.angular.z=self.z
-            self.cmd_pub.publish(self.mg)
-            
             return 'manual'
 
 
@@ -94,6 +92,7 @@ class Start(smach.State):
         
         if not self.switch:
             self.client.cancel_goal();
+            Switch.count=0
             return 'emergency'
         else:
             if not self.action:
@@ -101,7 +100,7 @@ class Start(smach.State):
                 goal=taskGoal()
 
                 goal.Goal.linear.x=0
-                goal.Goal.linear.y=5900
+                goal.Goal.linear.y=12810#5900
                 goal.Goal.angular.z=0
                 self.client.send_goal(goal)
                 self.action=True
@@ -118,22 +117,24 @@ class Wait(smach.State):
     def __init__(self):
         
         smach.State.__init__(self,outcomes=['wait','next'])
-        self.ord_sub=rospy.Subscriber('order',Twist,self.ordcb)
+        self.ord_sub=rospy.Subscriber('order',Int32,self.ordcb)
         self.try_sub=rospy.Subscriber('catch_ball',Bool,self.ctcb)
         self.cmd_pub=rospy.Publisher("cmd_vel",Twist)
         self.reset_pub=rospy.Publisher('reset',Empty)
+        self.go_pub=rospy.Publisher('Go',Bool)
         self.x=0
         self.y=0
         self.z=0
         self.catch=False
+        self.count=0
         self.mg=Twist()
-        self.auto_pub=rospy.Publisher('Go',Bool)
+        self.auto_pub=rospy.Publisher('manual',Bool)
 
-    def ordcb(self,mg):
-        self.x=mg.linear.x
-        self.y=mg.linear.y
-        self.z=mg.angular.z
-    
+    def ordcb(self,ms):
+        #self.x=mg.linear.x
+        #self.y=mg.linear.y
+        #self.z=mg.angular.z
+        self.count+=ms.data 
     def ctcb(self,Msg):
         self.catch=Msg.data
     
@@ -142,21 +143,18 @@ class Wait(smach.State):
             
         if self.catch:
             self.Mg=True
-            #self.reset_pub.publish()
+            self.reset_pub.publish()
             self.auto_pub.publish(self.Mg)
             self.catch=False
             return 'next'
             
         else:
             rospy.loginfo('wait state')
-            
             self.Mg=False
+            #self.auto_pub.publish(self.Mg)
+            #self.Mg=False
             self.auto_pub.publish(self.Mg)
-            self.mg.linear.x=self.x
-            self.mg.linear.y=self.y
-            self.mg.angular.z=self.z
-            self.cmd_pub.publish(self.mg)
-            
+            self.go_pub.publish(self.Mg)
             return 'wait'
 
 class Position(smach.State):
@@ -185,8 +183,8 @@ class Position(smach.State):
                 self.client.wait_for_server()
                 goal=taskGoal()
 
-                goal.Goal.linear.x=2700
-                goal.Goal.linear.y=-2900
+                goal.Goal.linear.x=1596
+                goal.Goal.linear.y=-2827
                 goal.Goal.angular.z=0
                 self.client.send_goal(goal)
                 self.action=True
@@ -210,9 +208,6 @@ class Try_Phase0(smach.State):
         self.switch=True
         self.action=False
         self.result=False
-
-
-
         
     def swcb(self,msg):
         self.switch=msg.data
@@ -233,8 +228,8 @@ class Try_Phase0(smach.State):
                 self.distance=Distance()
                 self.number=self.distance.Count()
 
-                goal.Goal.linear.x=1400*self.number
-                goal.Goal.linear.y=1600
+                goal.Goal.linear.x=1413.6
+                goal.Goal.linear.y=843.6*self.number
                 goal.Goal.angular.z=0
                 self.client.send_goal(goal)
                 self.action=True
@@ -255,22 +250,24 @@ class Try_Phase1(smach.State):
     def __init__(self):
         
         smach.State.__init__(self,outcomes=['phase1','next'])
-        self.ord_sub=rospy.Subscriber('order',Twist,self.ordcb)
+        self.ord_sub=rospy.Subscriber('order',Int32,self.ordcb)
         self.try_sub=rospy.Subscriber('success',Bool,self.trycb)
         self.cmd_pub=rospy.Publisher("cmd_vel",Twist)
         self.reset_pub=rospy.Publisher('reset',Empty)
+        self.go_pub=rospy.Publisher('Go',Bool)
         self.x=0
         self.y=0
         self.z=0
+        self.count=0
         self.success=False
         self.mg=Twist()
-        self.auto_pub=rospy.Publisher('Go',Bool)
+        self.auto_pub=rospy.Publisher('manual',Bool)
 
-    def ordcb(self,mg):
-        self.x=mg.linear.x
-        self.y=mg.linear.y
-        self.z=mg.angular.z
-    
+    def ordcb(self,ms):
+        #self.x=mg.linear.x
+        #self.y=mg.linear.y
+        #self.z=mg.angular.z
+        self.count+=ms.data 
     def trycb(self,Msg):
         self.success=Msg.data
     
@@ -289,6 +286,7 @@ class Try_Phase1(smach.State):
             
             self.Mg=False
             self.auto_pub.publish(self.Mg)
+            self.go_pub.publish(self.Mg)
             self.mg.linear.x=self.x
             self.mg.linear.y=self.y
             self.mg.angular.z=self.z
@@ -307,9 +305,6 @@ class Back_Phase0(smach.State):
         self.action=False
         self.result=False
 
-
-
-        
     def swcb(self,msg):
         self.switch=msg.data
     
@@ -327,8 +322,8 @@ class Back_Phase0(smach.State):
 
                 self.distance=Way_Back()
                 self.number=self.distance.Count()
-                goal.Goal.linear.x=-1300*self.number
-                goal.Goal.linear.y=-1660
+                goal.Goal.linear.x=-1413.6
+                goal.Goal.linear.y=-843.6*self.number
                 goal.Goal.angular.z=0
                 self.client.send_goal(goal)
                 self.action=True
@@ -373,8 +368,8 @@ class Back_Position(smach.State):
                 self.client.wait_for_server()
                 goal=taskGoal()
 
-                goal.Goal.linear.x=-3365
-                goal.Goal.linear.y=3740
+                goal.Goal.linear.x=-1596
+                goal.Goal.linear.y=2827
                 goal.Goal.angular.z=0
                 self.client.send_goal(goal)
                 self.action=True

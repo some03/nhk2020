@@ -3,6 +3,7 @@
 #include<nhk_2020/taskAction.h>
 #include<geometry_msgs/Twist.h>
 #include<std_msgs/Bool.h>
+#include<std_msgs/Float64.h>
 #include<bits/stdc++.h>
 
 class taskAction{
@@ -15,6 +16,9 @@ class taskAction{
 		nhk_2020::taskFeedback feedback_;
 		nhk_2020::taskResult result_;
    		ros::Publisher pub=nh.advertise<geometry_msgs::Twist>("cmd_ord",10);
+        //---
+        ros::Publisher kp_pub=nh.advertise<std_msgs::Float64>("accel",10);
+        //---
 		void posCb(const geometry_msgs::Twist::ConstPtr&mg);
  		ros::Subscriber pSb=nh.subscribe<geometry_msgs::Twist>("cmd_pos",10,&taskAction::posCb,this);
 
@@ -31,7 +35,8 @@ class taskAction{
 		double nowx=1,nowy=1,nowz=1;
 		double x=0,y=0,z=0;
 		double Dx=0,Dy=0,Dz=0;
-		int limit=1700;
+		int limit=1000;//1700;
+        double ac=-1;
 
 };
 void taskAction::posCb(const geometry_msgs::Twist::ConstPtr&msg){
@@ -42,22 +47,25 @@ void taskAction::posCb(const geometry_msgs::Twist::ConstPtr&msg){
  }
 
 void taskAction::exeCb(const nhk_2020::taskGoalConstPtr &goal){
-		ros::Rate loop_rate(1);
+		ros::Rate loop_rate(2);
 		bool success=true;
 
 		x=goal->Goal.linear.x;
 		y=goal->Goal.linear.y;
 		z=goal->Goal.angular.z;	
-
+        
 
         Dx=x;
 		Dy=y;
 		Dz=z;
 		geometry_msgs::Twist Ms;
+        std_msgs::Float64 msg;
 		
 		Ms.linear.x=Dx;
 		Ms.linear.y=Dy;
         Ms.angular.z=Dz;
+
+        msg.data=-0.1;
 
 	    //std::cout<<Dx<<" "<<Dy<<" "<<Dz<<std::endl;
 	while(Dx>limit || Dy>limit||Dx<-limit||Dy<-limit){
@@ -67,13 +75,22 @@ void taskAction::exeCb(const nhk_2020::taskGoalConstPtr &goal){
 	   	   	success=false;
 		   	break;
 		}
+
 		feedback_.passing=false;
+        
+        
+        kp_pub.publish(msg);
 		pub.publish(Ms);	
     	Dx=sqrt(pow(x-nowx,2));
 		Dy=sqrt(pow(y-nowy,2));
 		Dz=0;//(z-nowz);
 
-        std::cout<<Dx<<Dy<<Dz<<std::endl;
+        if(msg.data<=-0.02)msg.data+=0.01;
+        if(msg.data>=-0.02)msg.data=0.0;
+        std::cout<<msg.data;
+        //if(msg.data>=0.2)msg.data=0;
+        
+        //std::cout<<Dx<<Dy<<Dz<<std::endl;
 		
 		loop_rate.sleep();
 		std::cout<<"execute"<<std::endl;
