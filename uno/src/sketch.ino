@@ -9,8 +9,8 @@
 
 
 USB Usb;
-//BTD Btd(&Usb);
-PS3USB PS3(&Usb);
+BTD Btd(&Usb);
+PS3BT PS3(&Btd);
 
 int direction(int x, int y) {
   double deg , rad;
@@ -34,6 +34,7 @@ ros::NodeHandle nh;
 
 bool manual;
 int count;
+double r=1.3;
 
 void ml_Cb(const std_msgs::Bool &Mg){
     manual=Mg.data;
@@ -54,20 +55,23 @@ ros::Publisher ml_pub("order",&ms);
 ros::Subscriber<std_msgs::Bool>manu("manual",ml_Cb);
 
 void setup(){
-	#if !defined(__MIPSEL__)
+    #if !defined(__MIPSEL__)
     	#ifdef DEBUG
     		while (!Serial);
      	#endif
+        
 
 	#endif
     if (Usb.Init() == -1) {
-    /*   
-      #ifdef DEBUG
+      
+     #ifdef DEBUG
       Serial.print(F("\r\nOSC did not start"));
       #endif
 
-      */
+      
+
       while (1);
+    
     }
     manual=false;
     count=0;
@@ -86,18 +90,18 @@ void setup(){
 }
 void loop(){
 	Usb.Task();
-	if(PS3.PS3Connected||PS3.PS3NavigationConnected){
+  if(PS3.PS3Connected||PS3.PS3NavigationConnected){
 
-			int lx = PS3.getAnalogHat(LeftHatX);
-    		int ly = PS3.getAnalogHat(LeftHatY);
-            int rx = PS3.getAnalogHat(RightHatX);
-            int ry = PS3.getAnalogHat(RightHatY);
-			int cwx=(50+(lx-128))*0.5;
-			int cwy=-(127-(abs(ly-256)))*0.5;
-			int ccwx=abs(-50+(lx-128))*0.5;
-			int ccwy=abs(-127-(abs(ly-235)))*0.5;
-            int rcwx=(50+(rx-128))*0.5;
-            int rccwx=abs(-50+(rx-128))*0.5;
+			double lx = PS3.getAnalogHat(LeftHatX);
+    		double ly = PS3.getAnalogHat(LeftHatY);
+            double rx = PS3.getAnalogHat(RightHatX);
+            double ry = PS3.getAnalogHat(RightHatY);
+			double cwx=(lx-140)*r;//(50+(lx-128))*0.6;
+			double  cwy=-(ly-140)*r;//-(127-(abs(ly-256)));
+			double ccwx=(lx-115)*r;//abs(-50+(lx-128))*0.6;
+			double ccwy=abs(ly-115)*r;//abs(-127-(abs(ly-235)))*0.5;
+            double rcwx=(rx-140)*r;
+            double rccwx=abs(rx-115)*r;
             
                      
             
@@ -113,7 +117,7 @@ void loop(){
 						case 1:
 						case 8:
                         //left
-							mg.linear.x=-ccwx;
+							mg.linear.x=ccwx;
 							mg.linear.y=0;//sqrt(pow(cwx,2)+pow(cwy,2));
 							mg.angular.z=0;
 							if(!manual)ord_pub.publish(&mg);
@@ -225,28 +229,22 @@ void loop(){
                         go_pub.publish(&Mg);
                         try_pub.publish(&Msg);
                 }
-               /*else if(manual){
-                    while(count<2){
-
-					    mg.linear.x=0;
-					    mg.linear.y=0;
-					    mg.angular.z=0;
-                        ord_pub.publish(&mg);
-                    
-                        count++;
-                    }
-               }*/
+               
                     
                 else{
                     Msg.data=false;
                     ct_pub.publish(&Msg);
                     try_pub.publish(&Msg);
                 }
+
 		    }
 
 			nh.spinOnce();
 			
 	}
+    
+    
+    
 }
 
 

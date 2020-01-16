@@ -1,130 +1,107 @@
-//#define USE_USBCON
 #include<Wire.h>
-#include<Arduino.h>
 #include<ros.h>
+#include<geometry_msgs/TwistStamped.h>
 #include<MadgwickAHRS.h>
+#include<sensor_msgs/Imu.h>
+#include<sensor_msgs/MagneticField.h>
+#include<geometry_msgs/Vector3Stamped.h>
+#include<geometry_msgs/Vector3.h>
 #include<geometry_msgs/Twist.h>
-#include<std_msgs/Empty.h>
 
 ros::NodeHandle nh;
-
 Madgwick Md;
-//geometry_msgs::TwistStamped imuMsg;
-//ros::Publisher imu_pub("imu/raw",&imuMsg);
-
 geometry_msgs::Twist imuMsg;
-ros::Publisher imu_pub("imu",&imuMsg);
+//grometry_msgs::Vector3 imuMg;
+sensor_msgs::Imu imuMg;
+sensor_msgs::MagneticField magMg;
 
-#define Addr_Accl 0x19 //jp1,2,3 open
-#define Addr_Gyro 0x69
-#define Addr_Mag  0x13
+//geometry_msgs::Vector3Stamped magMg;
+ros::Publisher imuPb("imu/data_raw",&imuMg);
+ros::Publisher magPb("imu/mag",&magMg);
 
+ros::Publisher MdPb("imu",&imuMsg);
+//ros::Publisher magPb("imu/mag",&magMg);
 
-float xAccl=0.00;
-float yAccl=0.00;
-float zAccl=0.00;
+#define Addr_Accl 0x19  // (JP1,JP2,JP3 = Openの時)
+#define Addr_Gyro 0x69  // (JP1,JP2,JP3 = Openの時)
+#define Addr_Mag 0x13   // (JP1,JP2,JP3 = Openの時)
 
+float xAccl = 0.00;
+float yAccl = 0.00;
+float zAccl = 0.00;
+float xGyro = 0.00;
+float yGyro = 0.00;
+float zGyro = 0.00;
+int   xMag  = 0;
+int   yMag  = 0;
+int   zMag  = 0;
 
-float xGyro=0.00;
-float yGyro=0.00;
-float zGyro=0.00;
-
-float xGyroini=0.00;
-float yGyroini=0.00;
-float zGyroini=0.00;
-
-float xMag=0.00;
-float yMag=0.00;
-float zMag=0.00;
-
-void resetCb(const std_msgs::Empty &mg){
-
-    xAccl=0;
-    yAccl=0;
-    zAccl=0;
-
-    xGyro=0;
-    yGyro=0;
-    zGyro=0;
-    }
-ros::Subscriber<std_msgs::Empty>set("reset",resetCb);
-float count=0;
-
-void setup(){
-    Md.begin(1000);
-    nh.initNode();
-    nh.advertise(imu_pub);
-    nh.subscribe(set);
-    Wire.begin();
-    BMX055_Init();
-
-
-
-
-
-    delay(100);
+void setup()
+{
+  nh.initNode();
+  nh.advertise(imuPb);
+  nh.advertise(magPb);
+  nh.advertise(MdPb);
+  //nh.advertise(magPb);
+  Wire.begin();
+  BMX055_Init();
+  delay(300);
 }
 
-void loop(){
-    
-    
-
-    BMX055_Accl();
-    BMX055_Gyro();
-    BMX055_Mag();
-
-
-    xGyroini+=0.01;
-    yGyroini+=0.01;
-    zGyroini+=0.01;
-    
-    count +=0.01;
-
-
-    Serial.println("acclx:");
-    Serial.println(xAccl);
-    Serial.println(" ");
-    Serial.println("accly:");
-    Serial.println(yAccl);
-    Serial.println(" ");
-    Serial.println("acclz:");
-    Serial.println(zAccl);
-
-    Md.updateIMU(xGyro,yGyro,zGyro,xAccl,yAccl,zAccl);
-    float roll=Md.getRollRadians();
-    float pitch=Md.getPitchRadians();
-    float yaw=-Md.getYawRadians();
-
-    imuMsg.angular.z=yaw;
-    imu_pub.publish(&imuMsg);
-    nh.spinOnce();
+void loop()
+{
+  BMX055_Accl();
+  BMX055_Gyro();
+  //BMX055_Mag();
  /*   
-    Serial.println(roll);
-    Serial.println("  ");
-    Serial.println(pitch);
-    Serial.println("   ");
-    Serial.println(yaw);
-    Serial.println("   ");
-*/
+  imuMg.header.stamp=nh.now();
+  imuMg.twist.linear.x=xAccl;
+  imuMg.twist.linear.y=yAccl;
+  imuMg.twist.linear.z=zAccl;
+  imuMg.twist.angular.x=xGyro;
+  imuMg.twist.angular.y=yGyro;
+  imuMg.twist.angular.z=zGyro;
+  imuPb.publish(&imuMg);
+  nh.spinOnce();
+ */ 
+  imuMg.header.frame_id="imu_link";  
+  imuMg.header.stamp=nh.now();
+  imuMg.linear_acceleration.x=xAccl;
+  imuMg.linear_acceleration.y=yAccl;
+  imuMg.linear_acceleration.z=zAccl;
 
-   /*
-    imuMsg.header.stamp=nh.now();
-    imuMsg.twist.linear.x=xAccl;
-    imuMsg.twist.linear.y=yAccl;
-    imuMsg.twist.linear.z=zAccl;
-
-    imuMsg.twist.angular.x=xGyro;
-    imuMsg.twist.angular.y=yGyro;
-    imuMsg.twist.angular.z=zGyro;
-
-    imu_pub.publish(&imuMsg);
-    nh.spinOnce();
-*/
+  imuMg.angular_velocity.x=xGyro*0.05;
+  imuMg.angular_velocity.y=yGyro*0.05;
+  imuMg.angular_velocity.z=zGyro*0.05;
 
 
+  imuPb.publish(&imuMg);
+  nh.spinOnce();
+  delay(1);
+
+
+  
+  BMX055_Mag();
+ 
+  magMg.header.frame_id="imu_link";
+  magMg.header.stamp=nh.now();
+  magMg.magnetic_field.x=xMag;
+  magMg.magnetic_field.y=yMag;
+  magMg.magnetic_field.z=zMag;
+  magPb.publish(&magMg);
+  nh.spinOnce();
+  delay(1);
+
+  Md.updateIMU(xGyro,yGyro,zGyro,xAccl,yAccl,zAccl);
+  float roll=Md.getRollRadians();
+  float pitch=Md.getPitchRadians();
+  float yaw=-Md.getYawRadians();
+
+   imuMsg.angular.z=yaw;
+   MdPb.publish(&imuMsg);
+   nh.spinOnce();
+  
 }
-
-
 
 void BMX055_Init()
 {
@@ -226,9 +203,9 @@ void BMX055_Accl()
   if (yAccl > 2047)  yAccl -= 4096;
   zAccl = ((data[5] * 256) + (data[4] & 0xF0)) / 16;
   if (zAccl > 2047)  zAccl -= 4096;
-  xAccl = xAccl * 0.0196;//0.0098; // renge +-2g
-  yAccl = yAccl * 0.0196;//0.0098; // renge +-2g
-  zAccl = zAccl * 0.0196;//0.0098; // renge +-2g
+  xAccl = xAccl * 0.0098; // renge +-2g
+  yAccl = yAccl * 0.0098; // renge +-2g
+  zAccl = zAccl * 0.0098; // renge +-2g
 }
 //=====================================================================================//
 void BMX055_Gyro()
@@ -253,9 +230,9 @@ void BMX055_Gyro()
   zGyro = (data[5] * 256) + data[4];
   if (zGyro > 32767)  zGyro -= 65536;
 
-  xGyro = xGyro * 0.0076;//0.0038; //  Full scale = +/- 125 degree/s
-  yGyro = yGyro * 0.0076;//0.0038; //  Full scale = +/- 125 degree/s
-  zGyro = zGyro * 0.0076;//0.0038; //  Full scale = +/- 125 degree/s
+  xGyro = xGyro * 0.0038; //  Full scale = +/- 125 degree/s
+  yGyro = yGyro * 0.0038; //  Full scale = +/- 125 degree/s
+  zGyro = zGyro * 0.0038; //  Full scale = +/- 125 degree/s
 }
 //=====================================================================================//
 void BMX055_Mag()
@@ -279,59 +256,5 @@ void BMX055_Mag()
   if (yMag > 4095)  yMag -= 8192;
   zMag = ((data[5] <<8) | (data[4]>>3));
   if (zMag > 16383)  zMag -= 32768;
-}    
-
-//=====================================================================================//
-
-void BMX055_AcclInit()
-{
-  int data[6];
-  for (int i = 0; i < 6; i++)
-  {
-    Wire.beginTransmission(Addr_Accl); Wire.write((2 + i));// Select data register
-    Wire.endTransmission();
-    Wire.requestFrom(Addr_Accl, 1);// Request 1 byte of data
-    // Read 6 bytes of data
-    // xAccl lsb, xAccl msb, yAccl lsb, yAccl msb, zAccl lsb, zAccl msb
-    if (Wire.available() == 1)
-      data[i] = Wire.read();
-  }
-  // Convert the data to 12-bits
-  xAccl = ((data[1] * 256) + (data[0] & 0xF0)) / 16;
-  if (xAccl > 2047)  xAccl -= 4096;
-  yAccl = ((data[3] * 256) + (data[2] & 0xF0)) / 16;
-  if (yAccl > 2047)  yAccl -= 4096;
-  zAccl = ((data[5] * 256) + (data[4] & 0xF0)) / 16;
-  if (zAccl > 2047)  zAccl -= 4096;
-  xAccl = xAccl * 0.0196;//0.0098; // renge +-2g
-  yAccl = yAccl * 0.0196;//0.0098; // renge +-2g
-  zAccl = zAccl * 0.0196;//0.0098; // renge +-2g
 }
-//=====================================================================================//
 
-void BMX055_GyroInit()
-{
-  int data[6];
-  for (int i = 0; i < 6; i++)
-  {
-    Wire.beginTransmission(Addr_Gyro);
-    Wire.write((2 + i));    // Select data register
-    Wire.endTransmission();
-    Wire.requestFrom(Addr_Gyro, 1);    // Request 1 byte of data
-    // Read 6 bytes of data
-    // xGyro lsb, xGyro msb, yGyro lsb, yGyro msb, zGyro lsb, zGyro msb
-    if (Wire.available() == 1)
-      data[i] = Wire.read();
-  }
-  // Convert the data
-  xGyro = (data[1] * 256) + data[0];
-  if (xGyro > 32767)  xGyro -= 65536;
-  yGyro = (data[3] * 256) + data[2];
-  if (yGyro > 32767)  yGyro -= 65536;
-  zGyro = (data[5] * 256) + data[4];
-  if (zGyro > 32767)  zGyro -= 65536;
-
-  xGyro = xGyro * 0.0076;//0.0038; //  Full scale = +/- 125 degree/s
-  yGyro = yGyro * 0.0076;//0.0038; //  Full scale = +/- 125 degree/s
-  zGyro = zGyro * 0.0076;//0.0038; //  Full scale = +/- 125 degree/s
-}

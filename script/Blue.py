@@ -100,7 +100,9 @@ class Start(smach.State):
                 goal=taskGoal()
 
                 goal.Goal.linear.x=0
-                goal.Goal.linear.y=12810#5900
+        
+                goal.Goal.linear.y=5000#12810#5900
+
                 goal.Goal.angular.z=0
                 self.client.send_goal(goal)
                 self.action=True
@@ -139,19 +141,20 @@ class Wait(smach.State):
         self.catch=Msg.data
     
     def execute(self,data):
-        rospy.sleep(0.5)
+        rospy.sleep(0.1)
             
         if self.catch:
             self.Mg=True
             self.reset_pub.publish()
             self.auto_pub.publish(self.Mg)
+            #self.go_pub.publish(self.Mg);
             self.catch=False
             return 'next'
             
         else:
             rospy.loginfo('wait state')
             self.Mg=False
-            #self.auto_pub.publish(self.Mg)
+            self.auto_pub.publish(self.Mg)
             #self.Mg=False
             self.auto_pub.publish(self.Mg)
             self.go_pub.publish(self.Mg)
@@ -162,7 +165,9 @@ class Position(smach.State):
         smach.State.__init__(self,outcomes=['position','next','emergency'])
         self.sw_sub=rospy.Subscriber('switch',Bool,self.swcb)
         self.reset_pub=rospy.Publisher('reset',Empty)
-        self.client=actionlib.SimpleActionClient('action',taskAction)
+        self.client=actionlib.SimpleActionClient('action',taskAction)     
+        self.go_pub=rospy.Publisher('Go',Bool)
+        self.auto_pub=rospy.Publisher('manual',Bool)
         self.switch=True
         self.action=False
         self.result=False
@@ -172,7 +177,7 @@ class Position(smach.State):
         self.switch=msg.data
     
     def execute(self,data):
-        rospy.sleep(0.5)
+        rospy.sleep(0.1)
         
         if not self.switch:
             self.client.cancel_goal();
@@ -183,10 +188,11 @@ class Position(smach.State):
                 self.client.wait_for_server()
                 goal=taskGoal()
 
-                goal.Goal.linear.x=1596
-                goal.Goal.linear.y=-2827
+                goal.Goal.linear.x=2596*0.6
+                goal.Goal.linear.y=-4827*0.6
                 goal.Goal.angular.z=0
                 self.client.send_goal(goal)
+
                 self.action=True
                 return 'position'
             if not self.result and self.action:
@@ -195,8 +201,6 @@ class Position(smach.State):
                 return 'position'
             if self.result and self.action:
                 #self.reset_pub.publish()
-                self.action=False
-                self.result=False
                 return 'next'
 class Try_Phase0(smach.State):
     
@@ -213,7 +217,7 @@ class Try_Phase0(smach.State):
         self.switch=msg.data
     
     def execute(self,data):
-        rospy.sleep(0.5)
+        rospy.sleep(0.1)
         
         if not self.switch:
             self.client.cancel_goal();
@@ -272,12 +276,13 @@ class Try_Phase1(smach.State):
         self.success=Msg.data
     
     def execute(self,data):
-        rospy.sleep(0.5)
+        rospy.sleep(0.1)
             
         if self.success:
             self.Mg=True
-            #self.reset_pub.publish()
+            self.reset_pub.publish()
             self.auto_pub.publish(self.Mg)
+            #self.go_pub.publish(self.Mg)
             self.success=False
             return 'next'
             
@@ -286,11 +291,10 @@ class Try_Phase1(smach.State):
             
             self.Mg=False
             self.auto_pub.publish(self.Mg)
+            #self.Mg=False
+            self.auto_pub.publish(self.Mg)
             self.go_pub.publish(self.Mg)
-            self.mg.linear.x=self.x
-            self.mg.linear.y=self.y
-            self.mg.angular.z=self.z
-            self.cmd_pub.publish(self.mg)
+            
             
             return 'phase1'
 
@@ -309,7 +313,7 @@ class Back_Phase0(smach.State):
         self.switch=msg.data
     
     def execute(self,data):
-        rospy.sleep(0.5)
+        rospy.sleep(0.1)
         
         if not self.switch:
             self.client.cancel_goal();
@@ -357,7 +361,7 @@ class Back_Position(smach.State):
         self.switch=msg.data
     
     def execute(self,data):
-        rospy.sleep(0.5)
+        rospy.sleep(0.1)
         
         if not self.switch:
             self.client.cancel_goal();
@@ -368,8 +372,8 @@ class Back_Position(smach.State):
                 self.client.wait_for_server()
                 goal=taskGoal()
 
-                goal.Goal.linear.x=-1596
-                goal.Goal.linear.y=2827
+                goal.Goal.linear.x=-2596*0.6
+                goal.Goal.linear.y=4827*0.6
                 goal.Goal.angular.z=0
                 self.client.send_goal(goal)
                 self.action=True

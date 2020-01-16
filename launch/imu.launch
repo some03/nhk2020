@@ -1,6 +1,6 @@
 <launch>
 <!--arduino due-->
-  <node pkg="rosserial_python" type="serial_node.py" name="arduinoDue">
+  <node pkg="rosserial_python" type="serial_node.py" name="imu">
    	<param name="port" value="/dev/ttyACM2"/>
  </node>
 

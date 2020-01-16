@@ -18,7 +18,7 @@ class Omni{
 			ros::Subscriber cmdsub=nh.subscribe<geometry_msgs::Twist>("cmd_vel",10,&Omni::cmdcb,this);
 
 			void mtgo(int num,float speed);
-			float r=150;
+			float r=300;
 			float limit=150;
 };
 void Omni::mtgo(int num ,float speed){

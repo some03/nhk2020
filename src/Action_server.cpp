@@ -35,7 +35,7 @@ class taskAction{
 		double nowx=1,nowy=1,nowz=1;
 		double x=0,y=0,z=0;
 		double Dx=0,Dy=0,Dz=0;
-		int limit=1000;//1700;
+		int limit=450;//1700;
         double ac=-1;
 
 };
@@ -47,7 +47,7 @@ void taskAction::posCb(const geometry_msgs::Twist::ConstPtr&msg){
  }
 
 void taskAction::exeCb(const nhk_2020::taskGoalConstPtr &goal){
-		ros::Rate loop_rate(2);
+		ros::Rate loop_rate(5);
 		bool success=true;
 
 		x=goal->Goal.linear.x;
@@ -65,7 +65,7 @@ void taskAction::exeCb(const nhk_2020::taskGoalConstPtr &goal){
 		Ms.linear.y=Dy;
         Ms.angular.z=Dz;
 
-        msg.data=-0.1;
+        msg.data=0;
 
 	    //std::cout<<Dx<<" "<<Dy<<" "<<Dz<<std::endl;
 	while(Dx>limit || Dy>limit||Dx<-limit||Dy<-limit){
@@ -85,8 +85,8 @@ void taskAction::exeCb(const nhk_2020::taskGoalConstPtr &goal){
 		Dy=sqrt(pow(y-nowy,2));
 		Dz=0;//(z-nowz);
 
-        if(msg.data<=-0.02)msg.data+=0.01;
-        if(msg.data>=-0.02)msg.data=0.0;
+        if(msg.data<=1)msg.data+=0.01;
+        if(msg.data>=1)msg.data=1.0;
         std::cout<<msg.data;
         //if(msg.data>=0.2)msg.data=0;
         

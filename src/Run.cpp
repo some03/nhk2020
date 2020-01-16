@@ -109,8 +109,8 @@ void Run::publish(){
 		nowz=r*rad;
 
       
-		mg.linear.x=(kp+accel)*(x-nowx);
-		mg.linear.y=(kp+accel)*(y-nowy);
+		mg.linear.x=(kp*accel)*(x-nowx);
+		mg.linear.y=(kp*accel)*(y-nowy);
 		mg.angular.z=(z-nowz);
 
 		msg.linear.x=nowx;
@@ -129,8 +129,8 @@ void Run::publish(){
 
 
 		std::cout<<"x"<<mg.linear.x<<" "<<"y"<<mg.linear.y<<" "<<"z"<<mg.angular.z<<std::endl;	
-		std::cout<<nowx<<" "<<nowy<<" "<<nowz<<std::endl;	
-		
+	//	std::cout<<nowx<<" "<<nowy<<" "<<nowz<<std::endl;	
+	    std::cout<<kp+accel;	
 		pos_pub.publish(msg);
 		ord_pub.publish(mg);	
 
