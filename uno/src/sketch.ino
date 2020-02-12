@@ -75,167 +75,167 @@ void setup(){
     }
     manual=false;
     count=0;
-	nh.initNode();
-	nh.advertise(sw_pub);
-	nh.advertise(ord_pub);
+    nh.initNode();
+    nh.advertise(sw_pub);
+    nh.advertise(ord_pub);
     nh.advertise(try_pub);
     nh.advertise(ct_pub);
     nh.advertise(go_pub);
     nh.advertise(ml_pub);
     nh.subscribe(manu);
 
-	mg.linear.x=0;
-	mg.linear.y=0;
-	mg.angular.z=0;
+    mg.linear.x=0;
+    mg.linear.y=0;
+    mg.angular.z=0;
 }
 void loop(){
 	Usb.Task();
   if(PS3.PS3Connected||PS3.PS3NavigationConnected){
 
-			double lx = PS3.getAnalogHat(LeftHatX);
-    		double ly = PS3.getAnalogHat(LeftHatY);
-            double rx = PS3.getAnalogHat(RightHatX);
-            double ry = PS3.getAnalogHat(RightHatY);
-			double cwx=(lx-140)*r;//(50+(lx-128))*0.6;
-			double  cwy=-(ly-140)*r;//-(127-(abs(ly-256)));
-			double ccwx=(lx-115)*r;//abs(-50+(lx-128))*0.6;
-			double ccwy=abs(ly-115)*r;//abs(-127-(abs(ly-235)))*0.5;
-            double rcwx=(rx-140)*r;
-            double rccwx=abs(rx-115)*r;
+		double lx = PS3.getAnalogHat(LeftHatX);
+		double ly = PS3.getAnalogHat(LeftHatY);
+           	double rx = PS3.getAnalogHat(RightHatX);
+            	double ry = PS3.getAnalogHat(RightHatY);
+		double cwx=(lx-140)*r;//(50+(lx-128))*0.6;
+		double  cwy=-(ly-140)*r;//-(127-(abs(ly-256)));
+		double ccwx=(lx-115)*r;//abs(-50+(lx-128))*0.6;
+		double ccwy=abs(ly-115)*r;//abs(-127-(abs(ly-235)))*0.5;
+            	double rcwx=(rx-140)*r;
+            	double rccwx=abs(rx-115)*r;
             
                      
             
     
-			if (PS3.getAnalogHat(LeftHatX) > 137||PS3.getAnalogHat(LeftHatX) < 117|| PS3.getAnalogHat(LeftHatY) > 137|| PS3.getAnalogHat(LeftHatY) < 117){  
-					switch (direction(PS3.getAnalogHat(LeftHatX), PS3.getAnalogHat(LeftHatY))){
-						case 0:
-						 	mg.linear.x=0;
-							mg.linear.y=0;
-							mg.angular.z=0;
-                            if(!manual)ord_pub.publish(&mg);
-							break;
-						case 1:
-						case 8:
+		if (PS3.getAnalogHat(LeftHatX) > 137||PS3.getAnalogHat(LeftHatX) < 117|| PS3.getAnalogHat(LeftHatY) > 137|| PS3.getAnalogHat(LeftHatY) < 117){  
+				switch (direction(PS3.getAnalogHat(LeftHatX), PS3.getAnalogHat(LeftHatY))){
+					case 0:
+						mg.linear.x=0;
+						mg.linear.y=0;
+						mg.angular.z=0;
+                            			if(!manual)ord_pub.publish(&mg);
+						break;
+					case 1:
+					case 8:
                         //left
-							mg.linear.x=ccwx;
-							mg.linear.y=0;//sqrt(pow(cwx,2)+pow(cwy,2));
-							mg.angular.z=0;
-							if(!manual)ord_pub.publish(&mg);
-							break;
-						case 2:
-						case 3:
-							mg.linear.x=0;
-							mg.linear.y=cwy;
-							mg.angular.z=0;
-							if(!manual)ord_pub.publish(&mg);
-							break;
-						case 4:
-						case 5:
+						mg.linear.x=ccwx;
+						mg.linear.y=0;//sqrt(pow(cwx,2)+pow(cwy,2));
+						mg.angular.z=0;
+						if(!manual)ord_pub.publish(&mg);
+						break;
+					case 2:
+					case 3:
+						mg.linear.x=0;
+						mg.linear.y=cwy;
+						mg.angular.z=0;
+						if(!manual)ord_pub.publish(&mg);
+						break;
+					case 4:
+					case 5:
                         //right
-							mg.linear.x=cwx;
-							mg.linear.y=0;
-							mg.angular.z=0;
-							if(!manual)ord_pub.publish(&mg);
-							break;
-						case 6:
-						case 7:
-							mg.linear.x=0;
-							mg.linear.y=ccwy;
-							mg.angular.z=0;
-							if(!manual)ord_pub.publish(&mg);
-							break;
-                        default:
-                            break;
+						mg.linear.x=cwx;
+						mg.linear.y=0;
+						mg.angular.z=0;
+						if(!manual)ord_pub.publish(&mg);
+						break;
+					case 6:
+					case 7:
+						mg.linear.x=0;
+						mg.linear.y=ccwy;
+						mg.angular.z=0;
+						if(!manual)ord_pub.publish(&mg);
+						break;
+                        		default:
+                           			break;
 				}
 			}
             else if (PS3.getAnalogHat(RightHatX) > 137 || PS3.getAnalogHat(RightHatX) <117 || PS3.getAnalogHat(RightHatY) > 137 || PS3.getAnalogHat(RightHatY) < 117){
 //if(direction(PS3.getAnalogHat(LeftHatX), PS3.getAnalogHat(LeftHatY))==0)
-    switch (direction(PS3.getAnalogHat(RightHatX), PS3.getAnalogHat(RightHatY))) {
-           case 0:
-			    mg.linear.x=0;
-				mg.linear.y=0;
-				mg.angular.z=0;
-				if(!manual)ord_pub.publish(&mg);
-				break;
+    			switch (direction(PS3.getAnalogHat(RightHatX), PS3.getAnalogHat(RightHatY))) {
+           				case 0:
+			    			mg.linear.x=0;
+						mg.linear.y=0;
+						mg.angular.z=0;
+						if(!manual)ord_pub.publish(&mg);
+						break;
                 
-           case 1:
-           case 8:
-                mg.linear.x=0;
-                mg.linear.y=0;
-                mg.angular.z=-rccwx*0.003;
-                if(!manual)ord_pub.publish(&mg);
-                break;
-            case 4:
-            case 5:
-                mg.linear.x=0;
-                mg.linear.y=0;
-                mg.angular.z=rcwx*0.003;
-               if(!manual) ord_pub.publish(&mg);
-                break;
-                }
+           				case 1:
+           				case 8:
+               					 mg.linear.x=0;
+                				 mg.linear.y=0;
+                				 mg.angular.z=-rccwx*0.003;
+                				 if(!manual)ord_pub.publish(&mg);
+                				 break;
+            				case 4:
+            				case 5:
+                				mg.linear.x=0;
+                				mg.linear.y=0;
+                				mg.angular.z=rcwx*0.003;
+               					if(!manual) ord_pub.publish(&mg);
+                				break;
+                		}
             }
             
         
 
-			else{
+	  else{
                 
-			    mg.linear.x=0;
-			    mg.linear.y=0;
-			    mg.angular.z=0;
-                if(!manual)ord_pub.publish(&mg);
+			mg.linear.x=0;
+			mg.linear.y=0;
+			mg.angular.z=0;
+               		 if(!manual)ord_pub.publish(&mg);
 
-				if(PS3.getButtonPress(CIRCLE)){
-						msg.data=true;
-                        Mg.data=true;
-                        //manual=true;
-                        ms.data=0;
-                        ml_pub.publish(&ms);
-						sw_pub.publish(&msg);
-                       // go_pub.publish(&Mg);
+			if(PS3.getButtonPress(CIRCLE)){
+				msg.data=true;
+                        	Mg.data=true;
+                        	//manual=true;
+                       	 	ms.data=0;
+                        	ml_pub.publish(&ms);
+				sw_pub.publish(&msg);
+                       		// go_pub.publish(&Mg);
 				}
-				else if(PS3.getButtonPress(CROSS)){
-						msg.data=false;
-                        Mg.data=false;
+			else if(PS3.getButtonPress(CROSS)){
+				msg.data=false;
+                        	Mg.data=false;
 
-						mg.linear.x=0;
-						mg.linear.y=0;
-						mg.angular.z=0;
-                        ord_pub.publish(&mg);
-                        //manual=false;
+				mg.linear.x=0;
+				mg.linear.y=0;
+				mg.angular.z=0;
+                        	ord_pub.publish(&mg);
+                        	//manual=false;
                         
-						sw_pub.publish(&msg);
-                        go_pub.publish(&Mg);
+				sw_pub.publish(&msg);
+                        	go_pub.publish(&Mg);
 				}
-                else if(PS3.getButtonPress(TRIANGLE)){
-                        Msg.data=true;
-						msg.data=true;
-                        Mg.data=true;
-                        //manual=true;
-                        ms.data=0;
-                        ml_pub.publish(&ms);
-						sw_pub.publish(&msg);
-                        go_pub.publish(&Mg);
-                        ct_pub.publish(&Msg);
-                }
+                	else if(PS3.getButtonPress(TRIANGLE)){
+                        	Msg.data=true;
+				msg.data=true;
+                        	Mg.data=true;
+                        	//manual=true;
+                        	ms.data=0;
+                        	ml_pub.publish(&ms);
+				sw_pub.publish(&msg);
+                        	go_pub.publish(&Mg);
+                        	ct_pub.publish(&Msg);
+                	}
 
-                else if(PS3.getButtonPress(SQUARE)){
-                        Msg.data=true;
-						msg.data=true;
-                        Mg.data=true;
-                        //manual=true;
-                        ms.data=0;
-                        ml_pub.publish(&ms);
-						sw_pub.publish(&msg);
-                        go_pub.publish(&Mg);
-                        try_pub.publish(&Msg);
-                }
+                	else if(PS3.getButtonPress(SQUARE)){
+                        	Msg.data=true;
+				msg.data=true;
+                       	 	Mg.data=true;
+                        	//manual=true;
+                        	ms.data=0;
+                        	ml_pub.publish(&ms);
+				sw_pub.publish(&msg);
+                        	go_pub.publish(&Mg);
+                        	try_pub.publish(&Msg);
+                	}
                
                     
-                else{
-                    Msg.data=false;
-                    ct_pub.publish(&Msg);
-                    try_pub.publish(&Msg);
-                }
+                	else{
+                    		Msg.data=false;
+                    		ct_pub.publish(&Msg);
+                    		try_pub.publish(&Msg);
+                	}
 
 		    }
 
