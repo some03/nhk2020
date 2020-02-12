@@ -109,8 +109,8 @@ void Run::publish(){
 		nowz=r*rad;
 
       
-		mg.linear.x=(kp*accel)*(x-nowx);
-		mg.linear.y=(kp*accel)*(y-nowy);
+		mg.linear.x=accel*(kp*(x-nowx));
+		mg.linear.y=accel*(kp*(y-nowy));
 		mg.angular.z=(z-nowz);
 
 		msg.linear.x=nowx;

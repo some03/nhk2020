@@ -7,7 +7,7 @@
 
 #define PI  3.14159265359 
 #define GR  1.63636363636
-#define PULSE 2000.0
+#define PULSE 7000.0
 #define R 50.0
 class Run{
     public:
@@ -40,13 +40,15 @@ class Run{
 		long long enc3;
         
         double v[4]={0,1,2,3};
-        double oldEnc[4]={0,1,2,3};
-        double time;
+        double oldth[4]={0,1,2,3};
+        //double time;
 		
 		double nowx,nowy,nowz;
 		double kp,r,mxspd;
 		double x,y,z;
-        double Vx,Vy,theta;
+        double th0,th1,th2,th3;
+        double time;
+
 };
 Run::Run(){
 	nh.param<double>("kp",kp,0.01);
@@ -63,7 +65,7 @@ Run::Run(){
     nowy=0;
     nowz=0;
 
-    for(int i=0;i<4;i++)v[i]=0,oldEnc[i]=0;
+    for(int i=0;i<4;i++)v[i]=0,oldth[i]=0;
     
     time=0.0;
 	x=0,y=0,z=0;
@@ -98,67 +100,47 @@ void Run::autoCb(const std_msgs::Bool::ConstPtr& Mg){
 
 
 void Run::publish(){
+
+
 		geometry_msgs::Twist mg;
 		geometry_msgs::Twist msg;
 
-        v[0]=((enc0-oldEnc[0])/(PULSE*GR*time))*2*PI;
-        v[1]=((enc1-oldEnc[1])/(PULSE*GR*time))*2*PI;
-        v[2]=((enc2-oldEnc[2])/(PULSE*GR*time))*2*PI;
-        v[3]=((enc3-oldEnc[3])/(PULSE*GR*time))*2*PI;
+        th0=enc0/PULSE*2*PI;
+        th1=enc1/PULSE*2*PI;
+        th2=enc2/PULSE*2*PI;
+        th3=enc3/PULSE*2*PI;
 
-        oldEnc[0]=enc0;
-        oldEnc[1]=enc1;
-        oldEnc[2]=enc2;
-        oldEnc[3]=enc3;
+        v[0]=th0-oldth[0]/0.2;
+        v[1]=th1-oldth[1]/0.2;
+        v[2]=th2-oldth[2]/0.2;
+        v[3]=th3-oldth[3]/0.2;
 
-        time+=0.2;
-
-    std::cout<<"time"<<time<<" "<<v[0]<<" "<<v[1]<<" "<<v[2]<<" "<<v[3]<<std::endl;
-
-
-        Vx=0.35*(-v[0]+v[1]+v[2]-v[3]);
-        Vy=0.35*(v[0]+v[1]-v[2]-v[3]);
-        theta=0;
+        oldth[0]=th0;
+        oldth[1]=th1;
+        oldth[2]=th2;
+        oldth[3]=th3;
         
-		nowx+=Vx;
-		nowy+=Vy;
-		nowz=0;
-         
-		mg.linear.x=kp*(x-nowx);
-		mg.linear.y=kp*(y-nowy);
-		mg.angular.z=kp*(z-nowz);
+        time+=0.2;
+       
+        //ROS_INFO("time %lf",time);
+        ROS_INFO("theta %lf",th0);
+        for(int i=0;i<4;i++){
+            ROS_INFO("%lf",v[i]);
+        }
+        //std::cout<<time<<std::endl;
 
-		msg.linear.x=nowx;
-		msg.linear.y=nowy;
-		msg.angular.z=nowz;
-	
-		if(mg.linear.x>=0)mg.linear.x=std::min(mg.linear.x,mxspd);
-        else mg.linear.x=std::max(mg.linear.x,-mxspd);
-
-        if(mg.linear.y>=0)mg.linear.y=std::min(mg.linear.y,mxspd);
-        else mg.linear.y=std::max(mg.linear.y,-mxspd);
-
-        if(mg.linear.z>=0)mg.angular.z=std::min(mg.angular.z,mxspd);
-        else mg.angular.z=std::max(mg.angular.z,-mxspd);
-
-
-		std::cout<<"x"<<mg.linear.x<<" "<<"y"<<mg.linear.y<<" "<<"z"<<mg.linear.z<<std::endl;	
-		std::cout<<nowx<<" "<<nowy<<" "<<nowz<<std::endl;	
-		
-		pos_pub.publish(msg);
-		ord_pub.publish(mg);	
 
 }
-void Run::suspend(){
-}
+//void Run::suspend(){}
 
 int main(int argc,char**argv){
 		ros::init(argc,argv,"Test_Run");
 		Run run;
 		ros::Rate loop_rate(5);
 		while(ros::ok()){
-			if(run.go)run.publish();
-			else run.suspend();
+		/*	if(run.go)*/
+            run.publish();
+			//else run.suspend();
 			ros::spinOnce();
 			loop_rate.sleep();
 		}

@@ -85,7 +85,7 @@ void taskAction::exeCb(const nhk_2020::taskGoalConstPtr &goal){
 		Dy=sqrt(pow(y-nowy,2));
 		Dz=0;//(z-nowz);
 
-        if(msg.data<=1)msg.data+=0.01;
+        if(msg.data<=1)msg.data+=0.1;
         if(msg.data>=1)msg.data=1.0;
         std::cout<<msg.data;
         //if(msg.data>=0.2)msg.data=0;
