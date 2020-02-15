@@ -30,7 +30,7 @@ class Run{
 		ros::Publisher ord_pub=nh.advertise<geometry_msgs::Twist>("cmd_vel",10);
 		ros::Publisher pos_pub=nh.advertise<geometry_msgs::Twist>("cmd_pos",10);
 		
-        	void m0(const std_msgs::Int32::ConstPtr& msg);
+        void m0(const std_msgs::Int32::ConstPtr& msg);
 		void m1(const std_msgs::Int32::ConstPtr& msg);
 		void m2(const std_msgs::Int32::ConstPtr& msg);
 		void m3(const std_msgs::Int32::ConstPtr& msg);

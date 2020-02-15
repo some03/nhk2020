@@ -17,6 +17,9 @@ find_package(catkin REQUIRED COMPONENTS
   smach
   smach_ros
   std_msgs
+  tf2
+  tf2_ros
+  nav_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -76,7 +79,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate added messages and services with any dependencies listed here
  generate_messages(
    DEPENDENCIES
-   actionlib_msgs   geometry_msgs   std_msgs
+   actionlib_msgs   geometry_msgs   std_msgs nav_msgs
  )
 
 ################################################
@@ -111,7 +114,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES nhk_2020
-  CATKIN_DEPENDS actionlib actionlib_msgs geometry_msgs message_generation roscpp rospy smach smach_ros std_msgs
+  CATKIN_DEPENDS actionlib actionlib_msgs geometry_msgs message_generation roscpp rospy smach smach_ros std_msgs tf2 tf2_ros nav_msgs
 #  DEPENDS system_lib
 )
 
