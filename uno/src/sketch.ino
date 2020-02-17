@@ -9,8 +9,9 @@
 
 
 USB Usb;
-BTD Btd(&Usb);
-PS3BT PS3(&Btd);
+//BTD Btd(&Usb);
+//PS3BT PS3(&Btd);
+PS3USB PS3(&Usb);
 
 int direction(int x, int y) {
   double deg , rad;
@@ -34,7 +35,7 @@ ros::NodeHandle nh;
 
 bool manual;
 int count;
-double r=1.3;
+double r=2.5;
 
 void ml_Cb(const std_msgs::Bool &Mg){
     manual=Mg.data;
@@ -66,7 +67,7 @@ void setup(){
       
      #ifdef DEBUG
       Serial.print(F("\r\nOSC did not start"));
-      #endif
+        #endif
 
       
 
@@ -94,14 +95,14 @@ void loop(){
 
 		double lx = PS3.getAnalogHat(LeftHatX);
 		double ly = PS3.getAnalogHat(LeftHatY);
-           	double rx = PS3.getAnalogHat(RightHatX);
-            	double ry = PS3.getAnalogHat(RightHatY);
+        double rx = PS3.getAnalogHat(RightHatX);
+        double ry = PS3.getAnalogHat(RightHatY);
 		double cwx=(lx-140)*r;//(50+(lx-128))*0.6;
 		double  cwy=-(ly-140)*r;//-(127-(abs(ly-256)));
 		double ccwx=(lx-115)*r;//abs(-50+(lx-128))*0.6;
 		double ccwy=abs(ly-115)*r;//abs(-127-(abs(ly-235)))*0.5;
-            	double rcwx=(rx-140)*r;
-            	double rccwx=abs(rx-115)*r;
+        double rcwx=(rx-140)*r;
+        double rccwx=abs(rx-115)*r;
             
                      
             
@@ -112,7 +113,7 @@ void loop(){
 						mg.linear.x=0;
 						mg.linear.y=0;
 						mg.angular.z=0;
-                            			if(!manual)ord_pub.publish(&mg);
+                        if(!manual)ord_pub.publish(&mg);
 						break;
 					case 1:
 					case 8:
@@ -144,8 +145,8 @@ void loop(){
 						mg.angular.z=0;
 						if(!manual)ord_pub.publish(&mg);
 						break;
-                        		default:
-                           			break;
+                    default:
+                        break;
 				}
 			}
             else if (PS3.getAnalogHat(RightHatX) > 137 || PS3.getAnalogHat(RightHatX) <117 || PS3.getAnalogHat(RightHatY) > 137 || PS3.getAnalogHat(RightHatY) < 117){
@@ -153,25 +154,25 @@ void loop(){
     			switch (direction(PS3.getAnalogHat(RightHatX), PS3.getAnalogHat(RightHatY))) {
            				case 0:
 			    			mg.linear.x=0;
-						mg.linear.y=0;
-						mg.angular.z=0;
-						if(!manual)ord_pub.publish(&mg);
-						break;
+						    mg.linear.y=0;
+						    mg.angular.z=0;
+						    if(!manual)ord_pub.publish(&mg);
+						    break;
                 
            				case 1:
            				case 8:
-               					 mg.linear.x=0;
-                				 mg.linear.y=0;
-                				 mg.angular.z=-rccwx*0.003;
-                				 if(!manual)ord_pub.publish(&mg);
-                				 break;
-            				case 4:
-            				case 5:
-                				mg.linear.x=0;
-                				mg.linear.y=0;
-                				mg.angular.z=rcwx*0.003;
-               					if(!manual) ord_pub.publish(&mg);
-                				break;
+               				mg.linear.x=0;
+                			mg.linear.y=0;
+                			mg.angular.z=-rccwx*0.003;
+                			if(!manual)ord_pub.publish(&mg);
+                			break;
+            			case 4:
+            			case 5:
+                			mg.linear.x=0;
+                			mg.linear.y=0;
+                			mg.angular.z=rcwx*0.003;
+               				if(!manual) ord_pub.publish(&mg);
+                			break;
                 		}
             }
             
@@ -182,62 +183,62 @@ void loop(){
 			mg.linear.x=0;
 			mg.linear.y=0;
 			mg.angular.z=0;
-               		 if(!manual)ord_pub.publish(&mg);
+            if(!manual)ord_pub.publish(&mg);
 
 			if(PS3.getButtonPress(CIRCLE)){
 				msg.data=true;
-                        	Mg.data=true;
-                        	//manual=true;
-                       	 	ms.data=0;
-                        	ml_pub.publish(&ms);
+                Mg.data=true;
+                //manual=true;
+                ms.data=0;
+                ml_pub.publish(&ms);
 				sw_pub.publish(&msg);
-                       		// go_pub.publish(&Mg);
-				}
+                // go_pub.publish(&Mg);
+			}
 			else if(PS3.getButtonPress(CROSS)){
 				msg.data=false;
-                        	Mg.data=false;
+                Mg.data=false;
 
 				mg.linear.x=0;
 				mg.linear.y=0;
 				mg.angular.z=0;
-                        	ord_pub.publish(&mg);
-                        	//manual=false;
+                ord_pub.publish(&mg);
+                //manual=false;
                         
 				sw_pub.publish(&msg);
-                        	go_pub.publish(&Mg);
-				}
-                	else if(PS3.getButtonPress(TRIANGLE)){
-                        	Msg.data=true;
+                go_pub.publish(&Mg);
+			}
+            else if(PS3.getButtonPress(TRIANGLE)){
+                Msg.data=true;
 				msg.data=true;
-                        	Mg.data=true;
-                        	//manual=true;
-                        	ms.data=0;
-                        	ml_pub.publish(&ms);
+                Mg.data=true;
+                //manual=true;
+                ms.data=0;
+                ml_pub.publish(&ms);
 				sw_pub.publish(&msg);
-                        	go_pub.publish(&Mg);
-                        	ct_pub.publish(&Msg);
-                	}
+                //go_pub.publish(&Mg);
+                ct_pub.publish(&Msg);
+            }
 
-                	else if(PS3.getButtonPress(SQUARE)){
-                        	Msg.data=true;
+            else if(PS3.getButtonPress(SQUARE)){
+                Msg.data=true;
 				msg.data=true;
-                       	 	Mg.data=true;
-                        	//manual=true;
-                        	ms.data=0;
-                        	ml_pub.publish(&ms);
+                Mg.data=true;
+                //manual=true;
+                ms.data=0;
+                ml_pub.publish(&ms);
 				sw_pub.publish(&msg);
-                        	go_pub.publish(&Mg);
-                        	try_pub.publish(&Msg);
-                	}
+                //go_pub.publish(&Mg);
+                try_pub.publish(&Msg);
+            }
                
                     
-                	else{
-                    		Msg.data=false;
-                    		ct_pub.publish(&Msg);
-                    		try_pub.publish(&Msg);
-                	}
+            else{
+                Msg.data=false;
+                ct_pub.publish(&Msg);
+                try_pub.publish(&Msg);
+            }
 
-		    }
+		}
 
 			nh.spinOnce();
 			

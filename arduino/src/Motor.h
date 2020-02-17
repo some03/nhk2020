@@ -6,7 +6,7 @@ class Motor{
 			int pin1_,pin2_;
 		public:
 			Motor(int pin1,int pin2);
-			void run(int speed);
+			void run(int  speed);
 };
 
 #endif

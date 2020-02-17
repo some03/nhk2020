@@ -146,8 +146,11 @@ class Wait(smach.State):
         if self.catch:
             self.Mg=True
             self.reset_pub.publish()
+            rospy.sleep(0.5)
             self.auto_pub.publish(self.Mg)
+            
             #self.go_pub.publish(self.Mg);
+            
             self.catch=False
             return 'next'
             
@@ -155,7 +158,9 @@ class Wait(smach.State):
             rospy.loginfo('wait state')
             self.Mg=False
             self.auto_pub.publish(self.Mg)
+            
             #self.Mg=False
+            
             self.auto_pub.publish(self.Mg)
             self.go_pub.publish(self.Mg)
             return 'wait'
@@ -177,7 +182,7 @@ class Position(smach.State):
         self.switch=msg.data
     
     def execute(self,data):
-        rospy.sleep(0.1)
+        rospy.sleep(0.5)
         
         if not self.switch:
             self.client.cancel_goal();
@@ -196,11 +201,17 @@ class Position(smach.State):
                 self.action=True
                 return 'position'
             if not self.result and self.action:
+                self.Mg=True
+
+                self.go_pub.publish(self.Mg);
                 self.result=self.client.get_result()
                 rospy.loginfo(self.result)
                 return 'position'
             if self.result and self.action:
-                #self.reset_pub.publish()
+                
+                self.result=False
+                self.action=False
+                self.reset_pub.publish()
                 return 'next'
 class Try_Phase0(smach.State):
     
@@ -282,7 +293,9 @@ class Try_Phase1(smach.State):
             self.Mg=True
             self.reset_pub.publish()
             self.auto_pub.publish(self.Mg)
+            
             #self.go_pub.publish(self.Mg)
+            
             self.success=False
             return 'next'
             
@@ -291,7 +304,9 @@ class Try_Phase1(smach.State):
             
             self.Mg=False
             self.auto_pub.publish(self.Mg)
+            
             #self.Mg=False
+            
             self.auto_pub.publish(self.Mg)
             self.go_pub.publish(self.Mg)
             
@@ -305,6 +320,7 @@ class Back_Phase0(smach.State):
         self.sw_sub=rospy.Subscriber('switch',Bool,self.swcb)
         self.reset_pub=rospy.Publisher('reset',Empty)
         self.client=actionlib.SimpleActionClient('action',taskAction)
+        self.go_pub=rospy.Publisher('Go',Bool)
         self.switch=True
         self.action=False
         self.result=False
@@ -313,7 +329,7 @@ class Back_Phase0(smach.State):
         self.switch=msg.data
     
     def execute(self,data):
-        rospy.sleep(0.1)
+        rospy.sleep(0.5)
         
         if not self.switch:
             self.client.cancel_goal();
@@ -327,20 +343,25 @@ class Back_Phase0(smach.State):
                 self.distance=Way_Back()
                 self.number=self.distance.Count()
                 goal.Goal.linear.x=-1413.6
-                goal.Goal.linear.y=-843.6*self.number
+                goal.Goal.linear.y=843.6*self.number
                 goal.Goal.angular.z=0
                 self.client.send_goal(goal)
                 self.action=True
                 return 'phase0'
             
             if not self.result and self.action:
+                self.Mg=True
+
+                self.go_pub.publish(self.Mg)
                 self.result=self.client.get_result()
                 rospy.loginfo(self.result)
                 return 'phase0'
             
             if self.result and self.action:
                 rospy.loginfo(str(self.number)+':boll is tried')
+                
                 #self.reset_pub.publish()
+                
                 self.action=False
                 self.result=False
                 return 'next'
@@ -361,7 +382,7 @@ class Back_Position(smach.State):
         self.switch=msg.data
     
     def execute(self,data):
-        rospy.sleep(0.1)
+        rospy.sleep(0.5)
         
         if not self.switch:
             self.client.cancel_goal();
@@ -383,7 +404,9 @@ class Back_Position(smach.State):
                 rospy.loginfo(self.result)
                 return 'position'
             if self.result and self.action:
+                
                 #self.reset_pub.publish()
+                
                 self.action=False
                 self.result=False
                 return 'next'

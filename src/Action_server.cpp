@@ -35,8 +35,8 @@ class taskAction{
 		double nowx=1,nowy=1,nowz=1;
 		double x=0,y=0,z=0;
 		double Dx=0,Dy=0,Dz=0;
-		int limit=450;//1700;
-       	 	double ac=-1;
+		int limit=650;//450;//1700;
+       	double ac=-1;
 
 };
 void taskAction::posCb(const geometry_msgs::Twist::ConstPtr&msg){
@@ -55,17 +55,17 @@ void taskAction::exeCb(const nhk_2020::taskGoalConstPtr &goal){
 		z=goal->Goal.angular.z;	
         
 
-        	Dx=x;
+        Dx=x;
 		Dy=y;
 		Dz=z;
 		geometry_msgs::Twist Ms;
-        	std_msgs::Float64 msg;
+        std_msgs::Float64 msg;
 		
 		Ms.linear.x=Dx;
 		Ms.linear.y=Dy;
-        	Ms.angular.z=Dz;
+        Ms.angular.z=Dz;
 
-        	msg.data=0;
+        msg.data=0;
 
 	    //std::cout<<Dx<<" "<<Dy<<" "<<Dz<<std::endl;
 	while(Dx>limit || Dy>limit||Dx<-limit||Dy<-limit){
@@ -79,21 +79,19 @@ void taskAction::exeCb(const nhk_2020::taskGoalConstPtr &goal){
 		feedback_.passing=false;
         
         
-        	kp_pub.publish(msg);
+        kp_pub.publish(msg);
 		pub.publish(Ms);	
-    		Dx=sqrt(pow(x-nowx,2));
-		Dy=sqrt(pow(y-nowy,2));
+    	Dx=x-nowx;//sqrt(pow(x-nowx,2));
+		Dy=y-nowy;//sqrt(pow(y-nowy,2));
 		Dz=0;//(z-nowz);
 
-<<<<<<< HEAD
-        if(msg.data<=1)msg.data+=0.1;
+        if(msg.data<=1)msg.data+=0.01;
         if(msg.data>=1)msg.data=1.0;
         std::cout<<msg.data;
-=======
-        	if(msg.data<=1)msg.data+=0.01;
-        	if(msg.data>=1)msg.data=1.0;
-        	std::cout<<msg.data;
->>>>>>> 62fdbfb3d3c9044c14249d89b51f8e93796098f4
+        if(msg.data<=1)msg.data+=0.01;
+        if(msg.data>=1)msg.data=1.0;
+        std::cout<<msg.data;
+        
         //if(msg.data>=0.2)msg.data=0;
         
         //std::cout<<Dx<<Dy<<Dz<<std::endl;
@@ -108,7 +106,7 @@ void taskAction::exeCb(const nhk_2020::taskGoalConstPtr &goal){
 			nowx=0;
 			nowy=0;
 			std::cout<<"true"<<std::endl;
-         	   	loop_rate.sleep();
+         	loop_rate.sleep();
 			Task.setSucceeded(result_);
 	}
 }	

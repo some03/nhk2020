@@ -19,7 +19,7 @@ class Omni{
 
 			void mtgo(int num,float speed);
 			float r=300;
-			float limit=150;
+			float limit=190;
 };
 void Omni::mtgo(int num ,float speed){
 		std_msgs::Float32 mg;
@@ -58,6 +58,11 @@ void Omni::cmdcb(const geometry_msgs::Twist::ConstPtr& mg){
 int main(int argc,char**argv){
 		ros::init(argc,argv,"Omni");
 		Omni omni;
-		ros::spin();
+        ros::Rate loop_rate(5);
+		//ros::spin();
+        while(ros::ok()){
+            ros::spinOnce();
+            loop_rate.sleep();
+        }
 		return 0;
 }
