@@ -26,15 +26,15 @@ class Odom{
         ros::NodeHandle nh;
           
         void m0(const std_msgs::Int32::ConstPtr& msg);
-		void m1(const std_msgs::Int32::ConstPtr& msg);
-		void m2(const std_msgs::Int32::ConstPtr& msg);
-		void m3(const std_msgs::Int32::ConstPtr& msg);
+        void m1(const std_msgs::Int32::ConstPtr& msg);
+        void m2(const std_msgs::Int32::ConstPtr& msg);
+        void m3(const std_msgs::Int32::ConstPtr& msg);
         void imuCb(const sensor_msgs::Imu& msg);
 
         ros::Subscriber e0sub=nh.subscribe<std_msgs::Int32>("enc0",10,&Odom::m0,this);
-		ros::Subscriber e1sub=nh.subscribe<std_msgs::Int32>("enc1",10,&Odom::m1,this);
-		ros::Subscriber e2sub=nh.subscribe<std_msgs::Int32>("enc2",10,&Odom::m2,this);
-		ros::Subscriber e3sub=nh.subscribe<std_msgs::Int32>("enc3",10,&Odom::m3,this);
+        ros::Subscriber e1sub=nh.subscribe<std_msgs::Int32>("enc1",10,&Odom::m1,this);
+        ros::Subscriber e2sub=nh.subscribe<std_msgs::Int32>("enc2",10,&Odom::m2,this);
+        ros::Subscriber e3sub=nh.subscribe<std_msgs::Int32>("enc3",10,&Odom::m3,this);
         ros::Subscriber imu_sub=nh.subscribe("imu/data",10,&Odom::imuCb,this); 
 
 	
@@ -45,14 +45,14 @@ class Odom{
         ros::Time current_time,last_time;
         
         long long enc0;
-		long long enc1;
-		long long enc2;
-		long long enc3;
+        long long enc1;
+        long long enc2;
+        long long enc3;
 
         long long old_enc0;
-		long long old_enc1;
-		long long old_enc2;
-		long long old_enc3;
+        long long old_enc1;
+        long long old_enc2;
+        long long old_enc3;
         
         double x,y,th;
         double vx,vy,vth;
@@ -71,8 +71,8 @@ Odom::Odom(){
     
     old_enc0=0.0;
     old_enc1=0.0;
-	old_enc2=0.0;
-	old_enc3=0.0;
+    old_enc2=0.0;
+    old_enc3=0.0;
 }
 
 void Odom::m0(const std_msgs::Int32::ConstPtr& msg){
