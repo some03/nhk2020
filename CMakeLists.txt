@@ -220,7 +220,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(Run src/Run.cpp)
 target_link_libraries(Run ${catkin_LIBRARIES})
 
-add_executable(Omni src/Omuni.cpp)
+add_executable(Omni src/Omni.cpp)
 target_link_libraries(Omni ${catkin_LIBRARIES})
 
 add_executable(action  src/Action_server.cpp)
@@ -232,4 +232,6 @@ target_link_libraries(Test_Run ${catkin_LIBRARIES})
 add_executable(infomation  src/info.cpp)
 target_link_libraries(infomation ${catkin_LIBRARIES})
 
+add_executable(odometry  src/odom.cpp)
+target_link_libraries(odometry ${catkin_LIBRARIES})
 

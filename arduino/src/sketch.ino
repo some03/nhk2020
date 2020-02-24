@@ -66,9 +66,9 @@ void setup(){
 	
     
 	nh.initNode();
-    	nh.advertise(pub0);
-    	nh.advertise(pub1);
-    	nh.advertise(pub2);
+    nh.advertise(pub0);
+    nh.advertise(pub1);
+    nh.advertise(pub2);
 	nh.advertise(pub3);
 
 	nh.subscribe(m0s);

@@ -22,9 +22,9 @@ ros::Publisher magPb("imu/mag",&magMg);
 ros::Publisher MdPb("imu",&imuMsg);
 //ros::Publisher magPb("imu/mag",&magMg);
 
-#define Addr_Accl 0x19  // (JP1,JP2,JP3 = Openの時)
-#define Addr_Gyro 0x69  // (JP1,JP2,JP3 = Openの時)
-#define Addr_Mag 0x13   // (JP1,JP2,JP3 = Openの時)
+#define Addr_Accl 0x19  // (JP1,JP2,JP3 = Open)
+#define Addr_Gyro 0x69  // (JP1,JP2,JP3 = Open)
+#define Addr_Mag 0x13   // (JP1,JP2,JP3 = Open)
 
 float xAccl = 0.00;
 float yAccl = 0.00;
@@ -92,6 +92,7 @@ void loop()
   nh.spinOnce();
   delay(1);
 
+/*--when madgwick filter is used-------------------------//
   Md.updateIMU(xGyro,yGyro,zGyro,xAccl,yAccl,zAccl);
   float roll=Md.getRollRadians();
   float pitch=Md.getPitchRadians();
@@ -100,7 +101,7 @@ void loop()
    imuMsg.angular.z=yaw;
    MdPb.publish(&imuMsg);
    nh.spinOnce();
-  
+ -------------------------------------------------------*/ 
 }
 
 void BMX055_Init()
