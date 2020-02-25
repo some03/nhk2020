@@ -229,9 +229,11 @@ target_link_libraries(action ${catkin_LIBRARIES})
 add_executable(Test_Run  src/test.cpp)
 target_link_libraries(Test_Run ${catkin_LIBRARIES})
 
-add_executable(infomation  src/info.cpp)
-target_link_libraries(infomation ${catkin_LIBRARIES})
 
 add_executable(odometry  src/odom.cpp)
 target_link_libraries(odometry ${catkin_LIBRARIES})
+
+
+add_executable(odom_listener  route/odom_listener.cpp)
+target_link_libraries(odom_listener ${catkin_LIBRARIES})
 
