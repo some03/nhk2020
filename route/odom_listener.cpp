@@ -22,7 +22,7 @@ class Odom_listener{
         std::string world_frame_;
 };
 
-Odom_listener::Odom_listener():filename_("waypoints.yaml"){
+Odom_listener::Odom_listener():filename_("waypoints0.yaml"){
     
     start=0;
     pre_pose.position.x=0.0;
@@ -69,65 +69,60 @@ void Odom_listener::odomCb(const nav_msgs::Odometry &msg){
 
 void Odom_listener::save(){
     //-----------waypoints.yamlにかきだし----------------//
-    std::ofstream ofs(filename_.c_str(),std::ios::out);
-    ofs<<"waypoints"<<std::endl;
+    std::ofstream ofs("waypoints1.yaml");
+    ofs<<"waypoints:"<<std::endl;
 
     for(int i=0;i<waypoint.size();i++){
-       ofs<<" "<<"-position:"<<std::endl;        
-       ofs<<"  x:"<<waypoint[i].position.x<<std::endl;
-       ofs<<"  y:"<<waypoint[i].position.y<<std::endl;
-       ofs<<"  z:"<<waypoint[i].position.z<<std::endl;
-       ofs<<"  qx:"<<waypoint[i].orientation.x<<std::endl;
-       ofs<<"  qy:"<<waypoint[i].orientation.y<<std::endl;
-       ofs<<"  qz:"<<waypoint[i].orientation.z<<std::endl;
-       ofs<<"  qw:"<<waypoint[i].orientation.w<<std::endl;
+       ofs<<"  "<<"- position:"<<std::endl;        
+       ofs<<"      x: "<<waypoint[i].position.x<<std::endl;
+       ofs<<"      y: "<<waypoint[i].position.y<<std::endl;
+       ofs<<"      z: "<<waypoint[i].position.z<<std::endl;
+       ofs<<"      qx: "<<waypoint[i].orientation.x<<std::endl;
+       ofs<<"      qy: "<<waypoint[i].orientation.y<<std::endl;
+       ofs<<"      qz: "<<waypoint[i].orientation.z<<std::endl;
+       ofs<<"      qw: "<<waypoint[i].orientation.w<<std::endl;
 
     }
 
-    ofs<<"finish_pose"<<std::endl;
-    ofs<<" header:"<<std::endl;
-    ofs<<"  seq:"<<finish_pose_.header.seq<<std::endl;
-    ofs<<"   stamp:"<<finish_pose_.header.stamp<<std::endl;
-    ofs<<"   frame_id:"<<finish_pose_.header.frame_id<<std::endl;
-    ofs<<"  pose:"<<std::endl;
-    ofs<<"  position:"<<std::endl;
-    ofs<<"  x:"<<finish_pose_.pose.position.x<<std::endl;
-    ofs<<"  y:"<<finish_pose_.pose.position.y<<std::endl;
-    ofs<<"  z:"<<finish_pose_.pose.position.z<<std::endl;
-    ofs<<"  orientation:"<<std::endl;
-    ofs<<"  x:"<<finish_pose_.pose.orientation.x<<std::endl;
-    ofs<<"  y:"<<finish_pose_.pose.orientation.y<<std::endl;
-    ofs<<"  z:"<<finish_pose_.pose.orientation.z<<std::endl;
-    ofs<<"  w:"<<finish_pose_.pose.orientation.w<<std::endl;
+    ofs<<"finish_pose:"<<std::endl;
+    ofs<<"  header: "<<std::endl;
+    ofs<<"    seq: "<<finish_pose_.header.seq<<std::endl;
+    ofs<<"    stamp: "<<finish_pose_.header.stamp<<std::endl;
+    ofs<<"    frame_id: "<<finish_pose_.header.frame_id<<std::endl;
+    ofs<<"  pose: "<<std::endl;
+    ofs<<"    position: "<<std::endl;
+    ofs<<"      x: "<<finish_pose_.pose.position.x<<std::endl;
+    ofs<<"      y: "<<finish_pose_.pose.position.y<<std::endl;
+    ofs<<"      z: "<<finish_pose_.pose.position.z<<std::endl;
+    ofs<<"    orientation: "<<std::endl;
+    ofs<<"      x: "<<finish_pose_.pose.orientation.x<<std::endl;
+    ofs<<"      y: "<<finish_pose_.pose.orientation.y<<std::endl;
+    ofs<<"      z: "<<finish_pose_.pose.orientation.z<<std::endl;
+    ofs<<"      w: "<<finish_pose_.pose.orientation.w<<std::endl;
 
     ofs.close();
+    std::cout<<"write success"<<std::endl;
         
     
 }
+
 
 int main(int argc,char**argv){
     
     ros::init(argc,argv,"odom_listener");
     Odom_listener odom_listener;
-    
     ros::Rate loop_rate(2);
+
     while(ros::ok()){
-        if(odom_listener.start!=0)odom_listener.save();   
         ros::spinOnce();
         loop_rate.sleep();
     }
+    if(odom_listener.start!=0){
+        ROS_INFO_STREAM("start write");
+        odom_listener.save();
+
+    }
     return 0;
-
 }
-
-
-
-
-
-
-
-
-
-
 
 
