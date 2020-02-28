@@ -10,7 +10,7 @@ from geometry_msgs.msg import PoseStamped
 #[""waipoint"][num][position][x/y/z]
 #[finish_pose][header/position/orientation][value]
 sys.path.append(str(Path('__file__').resolve().parent.parent))
-data_raw='../../route/'
+data_raw='../route/'
 
 class File_Reader:
     y={}
@@ -38,9 +38,9 @@ class File_Reader:
             pose.pose.orientation.z=wp[i]['position']['qz']
             pose.pose.orientation.w=wp[i]['position']['qw']
             #print(pose)
-        return pose
+            return pose
 
-if __name__=="__main__"
+if __name__=="__main__":
     pass
 
 

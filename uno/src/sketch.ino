@@ -153,25 +153,25 @@ void loop(){
     			switch (direction(PS3.getAnalogHat(RightHatX), PS3.getAnalogHat(RightHatY))) {
            				case 0:
 			    			mg.linear.x=0;
-						mg.linear.y=0;
-						mg.angular.z=0;
-						if(!manual)ord_pub.publish(&mg);
-						break;
+						    mg.linear.y=0;
+						    mg.angular.z=0;
+						    if(!manual)ord_pub.publish(&mg);
+						    break;
                 
            				case 1:
            				case 8:
-               					 mg.linear.x=0;
-                				 mg.linear.y=0;
-                				 mg.angular.z=-rccwx*0.003;
-                				 if(!manual)ord_pub.publish(&mg);
-                				 break;
-            				case 4:
-            				case 5:
-                				mg.linear.x=0;
-                				mg.linear.y=0;
-                				mg.angular.z=rcwx*0.003;
-               					if(!manual) ord_pub.publish(&mg);
-                				break;
+               				mg.linear.x=0;
+                			mg.linear.y=0;
+                			mg.angular.z=-rccwx*0.003;
+                			if(!manual)ord_pub.publish(&mg);
+                			break;
+            			case 4:
+            			case 5:
+                			mg.linear.x=0;
+                			mg.linear.y=0;
+                			mg.angular.z=rcwx*0.003;
+               				if(!manual) ord_pub.publish(&mg);
+                			break;
                 		}
             }
             
@@ -182,62 +182,58 @@ void loop(){
 			mg.linear.x=0;
 			mg.linear.y=0;
 			mg.angular.z=0;
-               		 if(!manual)ord_pub.publish(&mg);
+            if(!manual)ord_pub.publish(&mg);
 
 			if(PS3.getButtonPress(CIRCLE)){
-				msg.data=true;
-                        	Mg.data=true;
-                        	//manual=true;
-                       	 	ms.data=0;
-                        	ml_pub.publish(&ms);
-				sw_pub.publish(&msg);
-                       		// go_pub.publish(&Mg);
-				}
+				Msg.data=true;
+                Mg.data=true;
+                ms.data=0;
+                ml_pub.publish(&ms);
+				sw_pub.publish(&Msg);
+			}
 			else if(PS3.getButtonPress(CROSS)){
 				msg.data=false;
-                        	Mg.data=false;
+                Mg.data=false;
 
 				mg.linear.x=0;
 				mg.linear.y=0;
 				mg.angular.z=0;
-                        	ord_pub.publish(&mg);
-                        	//manual=false;
+                ord_pub.publish(&mg);
                         
 				sw_pub.publish(&msg);
-                        	go_pub.publish(&Mg);
-				}
-                	else if(PS3.getButtonPress(TRIANGLE)){
-                        	Msg.data=true;
+                go_pub.publish(&Mg);
+			}
+            else if(PS3.getButtonPress(TRIANGLE)){
+                Msg.data=true;
 				msg.data=true;
-                        	Mg.data=true;
-                        	//manual=true;
-                        	ms.data=0;
-                        	ml_pub.publish(&ms);
+                Mg.data=true;
+                ms.data=0;
+                ml_pub.publish(&ms);
 				sw_pub.publish(&msg);
-                        	go_pub.publish(&Mg);
-                        	ct_pub.publish(&Msg);
-                	}
+                go_pub.publish(&Mg);
+                ct_pub.publish(&Msg);
+            }
 
-                	else if(PS3.getButtonPress(SQUARE)){
-                        	Msg.data=true;
+            else if(PS3.getButtonPress(SQUARE)){
+                Msg.data=true;
 				msg.data=true;
-                       	 	Mg.data=true;
-                        	//manual=true;
-                        	ms.data=0;
-                        	ml_pub.publish(&ms);
+                Mg.data=true;
+                ms.data=0;
+                ml_pub.publish(&ms);
 				sw_pub.publish(&msg);
-                        	go_pub.publish(&Mg);
-                        	try_pub.publish(&Msg);
-                	}
+                go_pub.publish(&Mg);
+                try_pub.publish(&Msg);
+            }
                
                     
-                	else{
-                    		Msg.data=false;
-                    		ct_pub.publish(&Msg);
-                    		try_pub.publish(&Msg);
-                	}
+            else{
+                    Msg.data=false;
+                    ct_pub.publish(&Msg);
+                    try_pub.publish(&Msg);
+                    sw_pub.publish(&Msg);
+            }
 
-		    }
+		}
 
 			nh.spinOnce();
 			

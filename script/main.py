@@ -1,6 +1,5 @@
-#!/usr/bin/python2
-from package import read_waypoint as way
-
+#!/usr/bin/env python2
+from package import read_waypoint as Wp
 import math
 import rospy
 import actionlib
@@ -12,3 +11,9 @@ from std_msgs.msg import Int32
 from std_msgs.msg import Bool
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Empty
+
+
+wp=Wp.File_Reader()
+a=wp.assign(1)
+print(a)
+
