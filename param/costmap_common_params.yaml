@@ -1,0 +1,10 @@
+obstacle_rangw: 5.0
+raytrace_range: 6.0
+
+map_type: voxel
+origin: 0.0
+z_resolution: 0.2
+z_voxels: 0.2
+
+publish_voxel_map: false
+max_obstacle_height: 0.6

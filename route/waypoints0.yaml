@@ -8,7 +8,7 @@ waypoints:
       qz: 0
       qw: 0
   - position:
-      x: 110
+      x: 20
       y: 0
       z: 0
       qx: 10
@@ -16,7 +16,7 @@ waypoints:
       qz: 0
       qw: 0
   - position:
-      x: 10
+      x: 30
       y: 0
       z: 0
       qx: 10

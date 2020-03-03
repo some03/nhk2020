@@ -21,6 +21,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_ros
   nav_msgs
   move_base_msgs
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -231,8 +232,8 @@ add_executable(Test_Run  src/test.cpp)
 target_link_libraries(Test_Run ${catkin_LIBRARIES})
 
 
-add_executable(odometry  src/odom.cpp)
-target_link_libraries(odometry ${catkin_LIBRARIES})
+add_executable(odometry_publisher  src/odom.cpp)
+target_link_libraries(odometry_publisher ${catkin_LIBRARIES})
 
 
 add_executable(odom_listener  route/odom_listener.cpp)

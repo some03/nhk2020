@@ -4,12 +4,6 @@
 #include<std_msgs/Int32.h>
 #include<std_msgs/Float32.h>
 
-#define PI  3.14159265359 
-#define GR  1.63636363636
-#define PULSE 7100.0
-#define R 50.0
-#define l 70
-
 class Omni{
 		private:
 			ros::NodeHandle nh;
@@ -26,7 +20,6 @@ class Omni{
 			void mtgo(int num,float speed);
 			float r=300;
 			float limit=150;
-            double th;
 };
 void Omni::mtgo(int num ,float speed){
 		std_msgs::Float32 mg;
@@ -35,26 +28,20 @@ void Omni::mtgo(int num ,float speed){
 }
 
 void Omni::cmdcb(const geometry_msgs::Twist::ConstPtr& mg){
-        //----translation speed vector3----------------
+		//translation speed vector3
 		geometry_msgs::Vector3 linear=mg->linear;
-		//-----rotational speed vector3----------------
+		//rotational speed vector3
 		geometry_msgs::Vector3 angular=mg->angular;
 		float x=linear.x;
 		float y=linear.y;
 		float z=angular.z;
 		float m[4];
-		/*m[0]=-sqrt(2)/2*x+sqrt(2)/2*y+r*z;
+		m[0]=-sqrt(2)/2*x+sqrt(2)/2*y+r*z;
 		m[1]=sqrt(2)/2*x+sqrt(2)/2*y+r*z;
 		m[2]=sqrt(2)/2*x-sqrt(2)/2*y+r*z;
 		m[3]=-sqrt(2)/2*x-sqrt(2)/2*y+r*z;
-        */
 
-
-        m[0]=-r*x*cos(th+PI/4)+r*y*sin(th+PI/4);
-        m[1]=r*x*cos(th+PI*3/4)+r*y*sin(th+PI/4);
-        m[2]=r*x*cos(th+PI*3/4)+r*y*sin(th+PI*7/4);
-        m[3]=-r*x*cos(th+PI/4)+r*y*sin(th+PI*7/4);
-
+		//m[0]*=10,m[1]*=10,m[2]*=10;
 
 		if(m[0]>=0)m[0]=std::min(m[0],limit);
 		else m[0]=std::max(m[0],-limit);

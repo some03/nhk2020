@@ -1,0 +1,18 @@
+<!--navigation-->
+<launch>
+    <!--mapserver-->
+        <arg name='map' default="$(find nhk_2020)/map/map.yaml"/>
+        <node name="map_server" pkg="map_server" type="map_server" args="$(arg map)">
+        <param name="frame_id" value="/odom"/>
+        </node>
+
+        <arg name="cmd_vel_topic" default="cmd_vel" />
+        <arg name="odom_topic" default="odom" />
+        <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+        </node>
+
+        <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+</launch>
+
+
+

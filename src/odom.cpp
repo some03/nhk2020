@@ -8,15 +8,16 @@
 #include<std_msgs/Bool.h>
 #include<tf2/LinearMath/Quaternion.h>
 #include<tf2/LinearMath/Matrix3x3.h>
+#include<tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include<tf2_ros/transform_broadcaster.h>
 #include<nav_msgs/Odometry.h>
 #include<sensor_msgs/Imu.h>
-
+#include<tf/transform_broadcaster.h>
 
 #define PI  3.14159265359 
 #define GR  1.63636363636
 #define PULSE 7100.0
-#define R 50.0
+#define R 0.05 
 
 class Odom{
     public:
@@ -40,10 +41,10 @@ class Odom{
 	
         ros::Publisher odom_pub=nh.advertise<nav_msgs::Odometry>("odom",10); 
        
-        tf2_ros::TransformBroadcaster odom_broadcaster;
+        tf::TransformBroadcaster odom_broadcaster;
         geometry_msgs::PoseStamped ps_msg;
         ros::Time current_time,last_time;
-        
+        geometry_msgs::Quaternion odom_quat; 
         long long enc0;
         long long enc1;
         long long enc2;
@@ -58,14 +59,15 @@ class Odom{
         double vx,vy,vth;
         double qx,qy,qz,qw;
         double roll,pitch,yaw;
-        double v0,v1,v2,v3;
+        int v0,v1,v2,v3;
     
-
+        double dt;
 };
+
 
 Odom::Odom(){
     
-    current_time=ros::Time::now();
+    //current_time=ros::Time::now();
     last_time=ros::Time::now();
     
     
@@ -73,6 +75,23 @@ Odom::Odom(){
     old_enc1=0.0;
     old_enc2=0.0;
     old_enc3=0.0;
+
+    enc0=0.0;
+    enc1=0.0;
+    enc2=0.0;
+    enc3=0.0;
+    
+    x=0; 
+    y=0;
+    th=0;
+    
+    vx=0;
+    vy=0;
+    vth=0;
+
+    dt=0;
+
+    yaw=0;
 }
 
 void Odom::m0(const std_msgs::Int32::ConstPtr& msg){
@@ -95,53 +114,60 @@ void Odom::imuCb(const sensor_msgs::Imu&  msg){
         qy=msg.orientation.y;
         qz=msg.orientation.z;
         qw=msg.orientation.w;
+
         
-        ps_msg.pose.orientation=msg.orientation;
+        //ps_msg.pose.orientation=msg.orientation;
 //-----geometry_msgs::Quaternion-->tf2::Quaternion-----------//
         tf2::Quaternion quat(qx,qy,qz,qw);
         tf2::Matrix3x3(quat).getRPY(roll,pitch,yaw);
+       
+        odom_quat=tf::createQuaternionMsgFromYaw(yaw);
 //----------------------------------------------------------//
-}
+    }
 
 
 void Odom::publish(){
-    
     current_time=ros::Time::now();
-    int dt=(current_time-last_time).toSec();
 
 //--各オムニホイールの角速度----------------------------------//
-    v0=((enc0-old_enc0)/(PULSE*dt))*2*PI;
-    v1=((enc1-old_enc1)/(PULSE*dt))*2*PI;
-    v2=((enc2-old_enc2)/(PULSE*dt))*2*PI;
-    v3=((enc3-old_enc3)/(PULSE*dt))*2*PI;
+    enc0-=7100;
+    enc1+=7100;
+    enc2+=7100;
+    enc3-=7100;
+
+    v0=((enc0*2*PI*R)/(PULSE*dt*GR));
+    v1=((enc1*2*PI*R)/(PULSE*dt*GR));
+    v2=((enc2*2*PI*R)/(PULSE*dt*GR));
+    v3=((enc3*2*PI*R)/(PULSE*dt*GR));
 //----------------------------------------------------------//
 
 //------オドメトリの計算------------------------------------//
-   double A=R*R*((v0*v0)+(v1*v1)+(v2*v2)+(v3*v3));
-   double B=R*(-v0+v1+v2-v3);
-   double C=R*(v0+v1-v2-v3);
-   double D=A-4*R*((v0*v2)+(v1*v3));
+   double A=0.35*(-v0+v1+v2-v3);
+   double B=0.35*(v0+v1-v2-v3);
+
    
    
    th=yaw;
    
-   vx=(0.35*-D)/(-B*cos(th))+(C*sin(th));
-   vy=B-((0.35*-D)/-B+(C*pow(sin(th),2)));
-   vth=yaw/dt;
+   vx=A*cos(th)-B*sin(th);
+   vy=A*sin(th)+B*cos(th);
+   vth=th;
 
-   x+=vx;
-   y+=vy;
-   
-   //死
+    x+=vx;
+    y+=vy;
+    
+    dt+=0.2;
+   //なんで？
 
    
    /*****デバッグ**********/
-   ROS_INFO("vx:","%lf",vx);
-   ROS_INFO("vy:","%lf",vy);
-   ROS_INFO("vth:","%lf",vth);
+   ROS_INFO("vx: %lf",vx);
+   ROS_INFO("vy: %lf",vy);
+   ROS_INFO("vth: %lf",vth);
 
-   ROS_INFO("X:","%lf",x);
-   ROS_INFO("Y:","%lf",y);
+   ROS_INFO("X: %lf",x);
+   ROS_INFO("Y: %lf",y);
+   
    /***********************/
 
 //---------------------------------------------------------//
@@ -151,10 +177,10 @@ void Odom::publish(){
     odom_trans.header.frame_id="odom";
     odom_trans.child_frame_id="base_link";
 
-    odom_trans.transform.translation.x=x;
-    odom_trans.transform.translation.y=y;
+    odom_trans.transform.translation.x=x;//0x;
+    odom_trans.transform.translation.y=y;//y;
     odom_trans.transform.translation.z=0.0;
-    odom_trans.transform.rotation=ps_msg.pose.orientation;
+    odom_trans.transform.rotation=odom_quat;
 
     odom_broadcaster.sendTransform(odom_trans);
     
@@ -167,7 +193,8 @@ void Odom::publish(){
     odom.pose.pose.position.x=x;
     odom.pose.pose.position.y=y;
     odom.pose.pose.position.z=0.0;
-    odom.pose.pose.orientation=ps_msg.pose.orientation;
+    odom.pose.pose.orientation=odom_quat;
+
 //-----------------------------------//
 //--------set velocity----------------//
     odom.child_frame_id="base_link";
@@ -177,16 +204,10 @@ void Odom::publish(){
 
     odom_pub.publish(odom);
 
-//-------更新-------------------------//
-    last_time=current_time;
-    old_enc0=enc0;
-    old_enc1=enc1;
-    old_enc2=enc2;
-    old_enc3=enc3;
 }
 
 int main(int argc,char**argv){
-    ros::init(argc,argv,"odometry");
+    ros::init(argc,argv,"odometry_publisher");
     Odom odom;
     ros::Rate loop_rate(5);
     while(ros::ok()){
@@ -196,7 +217,4 @@ int main(int argc,char**argv){
     }
     return 0;
 }
-    
-
-
 
