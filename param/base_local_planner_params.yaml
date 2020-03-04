@@ -1,19 +1,22 @@
 TrajectryPlannerROS:
-    acc_lim_x: 300.0
-    acc_lim_theta: 300.0
+    controller_frequency: 5.0
     max_vel_x:  300.0
     min_vel_x: -300.0 
-   
-    max_vel_theta: 1.0
-    min_vel_theta: -1.0
-    min_in_place_vel_theta: 0.6
-
-    #goal param
-    
-    yaw_goal_tolerance: 0.05
-    xy_goal_tolerance: 0.1
-
+    max_rostational_vel: 1.0
+    min_in_place_vel_theta: 0.5
+    acc_lim_x: 2.5
+    acc_lim_y: 2.5
+    acc_lim_theta: 3.5
     holonomic_robot: true
+    yaw_goal_tolerance: 0.5
+    xy_goal_tolerance: 0.5
+    pdist_scale: 0.1
+    gdist_scale: 0.5
+    sim_time: 1.0
+    dwa: false
+
+
+   
 
 
 

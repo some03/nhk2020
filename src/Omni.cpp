@@ -3,6 +3,14 @@
 #include<geometry_msgs/Twist.h>
 #include<std_msgs/Int32.h>
 #include<std_msgs/Float32.h>
+#include<tf2/LinearMath/Quaternion.h>
+#include<tf2/LinearMath/Matrix3x3.h>
+#include<sensor_msgs/Imu.h>
+#define PI  3.14159265359 
+#define GR  1.63636363636
+#define PULSE 7100.0
+#define R 50.0
+#define l 70
 
 class Omni{
 		private:
@@ -15,12 +23,32 @@ class Omni{
 			};
 
 			void cmdcb(const geometry_msgs::Twist::ConstPtr& mg);
-			ros::Subscriber cmdsub=nh.subscribe<geometry_msgs::Twist>("cmd_vel",10,&Omni::cmdcb,this);
+			ros::Subscriber cmdsub=nh.subscribe("cmd_vel",10,&Omni::cmdcb,this);
 
-			void mtgo(int num,float speed);
-			float r=300;
-			float limit=150;
+            void imuCb(const sensor_msgs::Imu& msg);
+            ros::Subscriber imu_sub=nh.subscribe("imu/data",10,&Omni::imuCb,this); 
+			
+            void mtgo(int num,float speed);
+			float r=0.05;
+			float limit=190;
+            int th;
+
+            double qx,qy,qz,qw;
+            double roll,pitch,yaw;
 };
+
+void Omni::imuCb(const sensor_msgs::Imu&  msg){
+        
+        qx=msg.orientation.x;
+        qy=msg.orientation.y;
+        qz=msg.orientation.z;
+        qw=msg.orientation.w;
+
+        
+        tf2::Quaternion quat(qx,qy,qz,qw);
+        tf2::Matrix3x3(quat).getRPY(roll,pitch,yaw);
+}       
+
 void Omni::mtgo(int num ,float speed){
 		std_msgs::Float32 mg;
 		mg.data=speed;
@@ -28,20 +56,26 @@ void Omni::mtgo(int num ,float speed){
 }
 
 void Omni::cmdcb(const geometry_msgs::Twist::ConstPtr& mg){
-		//translation speed vector3
+        //----translation speed vector3----------------
 		geometry_msgs::Vector3 linear=mg->linear;
-		//rotational speed vector3
+		//-----rotational speed vector3----------------
 		geometry_msgs::Vector3 angular=mg->angular;
 		float x=linear.x;
 		float y=linear.y;
 		float z=angular.z;
 		float m[4];
-		m[0]=-sqrt(2)/2*x+sqrt(2)/2*y+r*z;
+		/*m[0]=-sqrt(2)/2*x+sqrt(2)/2*y+r*z;
 		m[1]=sqrt(2)/2*x+sqrt(2)/2*y+r*z;
 		m[2]=sqrt(2)/2*x-sqrt(2)/2*y+r*z;
 		m[3]=-sqrt(2)/2*x-sqrt(2)/2*y+r*z;
+        */
+        th=yaw;
 
-		//m[0]*=10,m[1]*=10,m[2]*=10;
+        m[0]=-r*x*cos(th+PI/4)+r*y*sin(th+PI/4)+r*z;
+        m[1]=r*x*cos(th+PI*3/4)+r*y*sin(th+PI/4)+r*z;
+        m[2]=r*x*cos(th+PI*3/4)+r*y*sin(th+PI*7/4)+r*z;
+        m[3]=-r*x*cos(th+PI/4)+r*y*sin(th+PI*7/4)+r*z;
+
 
 		if(m[0]>=0)m[0]=std::min(m[0],limit);
 		else m[0]=std::max(m[0],-limit);
@@ -52,6 +86,8 @@ void Omni::cmdcb(const geometry_msgs::Twist::ConstPtr& mg){
 		if(m[3]>=0)m[3]=std::min(m[3],limit);
 		else m[3]=std::max(m[3],-limit);
 
+        std::cout<<m[0];
+
 		for(int i=0;i<4;i++)mtgo(i,m[i]);
 
 }
@@ -61,3 +97,5 @@ int main(int argc,char**argv){
 		ros::spin();
 		return 0;
 }
+
+
