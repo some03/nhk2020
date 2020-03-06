@@ -4,7 +4,7 @@
         
         <arg name='map' default="$(find nhk_2020)/map/map.yaml"/>
         <node name="map_server" pkg="map_server" type="map_server" args="$(arg map)">
-        <param name="frame_id" value="/odom"/>
+        <param name="frame_id" value="/map"/>
         </node>
     
     <!--move_base-->    

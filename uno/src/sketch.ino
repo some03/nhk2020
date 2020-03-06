@@ -22,7 +22,7 @@ int direction(int x, int y) {
   if (abs(x) > 16 || abs(y) > 16) {
     deg += 180.0;
     for (int i = 0; i < 8; i++) {
-      if (deg >= 0.0 + (i * 45.0) && deg < 45.0 + (i * 45.0)) {//分割数を指定
+      if (deg >= 0.0 + (i * 22.5) && deg < 22.5 + (i * 22.5)) {//分割数を指定
         pattern = i + 1;
       }
     }
@@ -94,14 +94,19 @@ void loop(){
 
 		double lx = PS3.getAnalogHat(LeftHatX);
 		double ly = PS3.getAnalogHat(LeftHatY);
-           	double rx = PS3.getAnalogHat(RightHatX);
-            	double ry = PS3.getAnalogHat(RightHatY);
+        double rx = PS3.getAnalogHat(RightHatX);
+        double ry = PS3.getAnalogHat(RightHatY);
 		double cwx=(lx-140)*r;//(50+(lx-128))*0.6;
-		double  cwy=-(ly-140)*r;//-(127-(abs(ly-256)));
+		double cwy=-(ly-140)*r;//-(127-(abs(ly-256)));
 		double ccwx=(lx-115)*r;//abs(-50+(lx-128))*0.6;
 		double ccwy=abs(ly-115)*r;//abs(-127-(abs(ly-235)))*0.5;
-            	double rcwx=(rx-140)*r;
-            	double rccwx=abs(rx-115)*r;
+        double fr=sqrt(pow(cwx,2)+pow(cwy,2));
+        double fl=sqrt(pow(ccwx,2)+pow(cwy,2));
+        double bl=sqrt(pow(ccwx,2)+pow(ccwy,2));
+        double br=sqrt(pow(cwx,2)+pow(ccwy,2));
+
+        double rcwx=(rx-140)*r;
+        double rccwx=abs(rx-115)*r;
             
                      
             
@@ -112,10 +117,10 @@ void loop(){
 						mg.linear.x=0;
 						mg.linear.y=0;
 						mg.angular.z=0;
-                            			if(!manual)ord_pub.publish(&mg);
+                        if(!manual)ord_pub.publish(&mg);
 						break;
 					case 1:
-					case 8:
+					case 16:
                         //left
 						mg.linear.x=ccwx;
 						mg.linear.y=0;//sqrt(pow(cwx,2)+pow(cwy,2));
@@ -124,28 +129,58 @@ void loop(){
 						break;
 					case 2:
 					case 3:
-						mg.linear.x=0;
-						mg.linear.y=cwy;
+                        //left
+						mg.linear.x=bl;
+						mg.linear.y=bl;//sqrt(pow(cwx,2)+pow(cwy,2));
 						mg.angular.z=0;
 						if(!manual)ord_pub.publish(&mg);
 						break;
 					case 4:
 					case 5:
                         //right
-						mg.linear.x=cwx;
-						mg.linear.y=0;
-						mg.angular.z=0;
-						if(!manual)ord_pub.publish(&mg);
-						break;
-					case 6:
-					case 7:
 						mg.linear.x=0;
 						mg.linear.y=ccwy;
 						mg.angular.z=0;
 						if(!manual)ord_pub.publish(&mg);
 						break;
-                        		default:
-                           			break;
+
+					case 6:
+					case 7:
+						mg.linear.x=br;
+						mg.linear.y=br;
+						mg.angular.z=0;
+						if(!manual)ord_pub.publish(&mg);
+						break;
+					case 8:
+					case 9:
+						mg.linear.x=cwx;
+						mg.linear.y=0;
+						mg.angular.z=0;
+						if(!manual)ord_pub.publish(&mg);
+						break;
+					case 10:
+					case 11:
+						mg.linear.x=fr;
+						mg.linear.y=fr;
+						mg.angular.z=0;
+						if(!manual)ord_pub.publish(&mg);
+						break;
+					case 12:
+					case 13:
+						mg.linear.x=0;
+						mg.linear.y=cwy;
+						mg.angular.z=0;
+						if(!manual)ord_pub.publish(&mg);
+						break;
+					case 14:
+					case 15:
+						mg.linear.x=fl;
+						mg.linear.y=fl;
+						mg.angular.z=0;
+						if(!manual)ord_pub.publish(&mg);
+						break;
+                    default:
+                        break;
 				}
 			}
             else if (PS3.getAnalogHat(RightHatX) > 137 || PS3.getAnalogHat(RightHatX) <117 || PS3.getAnalogHat(RightHatY) > 137 || PS3.getAnalogHat(RightHatY) < 117){

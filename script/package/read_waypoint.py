@@ -25,7 +25,7 @@ class File_Reader:
 
         pose=MoveBaseGoal() 
         pose.target_pose.header.frame_id='map'
-        self.tfBuffer.lookup_transform('map','base_link',rospy.Time(),rospy.Duration(4.0))
+        self.tfBuffer.lookup_transform('odom','base_link',rospy.Time(),rospy.Duration(4.0))
 
 
 
@@ -62,7 +62,7 @@ class File_Reader:
 
             while True:
                 now=rospy.Time.now() 
-                self.tfBuffer.lookup_transform('map','base_link',now,rospy.Duration(4.0))
+                self.tfBuffer.lookup_transform('odom','base_link',now,rospy.Duration(4.0))
                 position,quaternion=self.listener.lookupTrandform("map","base_link",now)
                 distance=math.sqrt(((position[0]-pose.target_pose.pose.position.x)**2+(position[1]-pose.target_pose.pose.position.y)**2))
                 if(distace<=1):
