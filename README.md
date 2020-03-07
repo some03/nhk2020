@@ -12,11 +12,11 @@ odomからbase_linkへの変換
 move_baseのパラメータ  　
 * /route  
 手動で走らせた際のオドメトリ情報をyamlファイルに保存　　
-*/script/main.py  　
-smach  まだ書いてない  　
-*/script/package/read_waypoint.py  
+* /script/main.py  　
+smach まだ書いてない  
+* /script/package/read_waypoint.py  
 モジュール、routeにあるファイルを読み込んでmove_baseに目標値を送る　　
-*/bmx/src　　
-imuの読み取り  　　
-
-
+* /bmx/src　　
+imuの読み取り
+## tf tree
+map->odom->base_link
