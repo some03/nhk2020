@@ -219,14 +219,10 @@ include_directories(
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
-add_executable(Run src/Run.cpp)
-target_link_libraries(Run ${catkin_LIBRARIES})
 
 add_executable(Omni src/Omni.cpp)
 target_link_libraries(Omni ${catkin_LIBRARIES})
 
-add_executable(action  src/Action_server.cpp)
-target_link_libraries(action ${catkin_LIBRARIES})
 
 add_executable(Test_Run  src/test.cpp)
 target_link_libraries(Test_Run ${catkin_LIBRARIES})

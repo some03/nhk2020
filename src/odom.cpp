@@ -42,6 +42,7 @@ class Odom{
         ros::Publisher odom_pub=nh.advertise<nav_msgs::Odometry>("odom",10); 
        
         tf::TransformBroadcaster odom_broadcaster;
+        tf::TransformBroadcaster map_broadcaster;
         geometry_msgs::PoseStamped ps_msg;
         ros::Time current_time,last_time;
         geometry_msgs::Quaternion odom_quat; 
@@ -57,11 +58,12 @@ class Odom{
         
         double x,y,th;
         double vx,vy,vth;
-        double qx,qy,qz,qw;
         double roll,pitch,yaw;
         int v0,v1,v2,v3;
     
         double dt;
+        
+        geometry_msgs::Quaternion Q;
 };
 
 
@@ -110,18 +112,19 @@ void Odom::m3(const std_msgs::Int32::ConstPtr& msg){
 
 
 void Odom::imuCb(const sensor_msgs::Imu&  msg){
-        qx=msg.orientation.x;
-        qy=msg.orientation.y;
-        qz=msg.orientation.z;
-        qw=msg.orientation.w;
-
+   
+        Q.x=msg.orientation.x;
+        Q.y=msg.orientation.y;
+        Q.z=msg.orientation.z;
+        Q.w=msg.orientation.w;
+    
         
         //ps_msg.pose.orientation=msg.orientation;
 //-----geometry_msgs::Quaternion-->tf2::Quaternion-----------//
-        tf2::Quaternion quat(qx,qy,qz,qw);
-        tf2::Matrix3x3(quat).getRPY(roll,pitch,yaw);
-       
+        tf::Quaternion quat(Q.x,Q.y,Q.z,Q.w);
+        tf::Matrix3x3(quat).getRPY(roll,pitch,yaw);
         odom_quat=tf::createQuaternionMsgFromYaw(yaw);
+        std::cout<<yaw;
 //----------------------------------------------------------//
     }
 
@@ -143,14 +146,14 @@ void Odom::publish(){
 
    
    
-   th=yaw;
+   th+=yaw;
    
    vx=A*cos(th)-B*sin(th);
    vy=A*sin(th)+B*cos(th);
    vth=th;
 
-    x+=vx;
-    y+=vy;
+    x+=x;
+    y+=y;
     
     dt+=0.2;
    //なんで？
@@ -164,8 +167,7 @@ void Odom::publish(){
    ROS_INFO("X: %lf",x);
    ROS_INFO("Y: %lf",y);
    
-   /***********************/
-
+   /************************/
 //---------------------------------------------------------//
 //===----tf--------------------------------=====//
     geometry_msgs::TransformStamped odom_trans; 
