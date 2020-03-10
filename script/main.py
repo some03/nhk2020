@@ -14,7 +14,6 @@ class File_Number():
     def Count(self):
         File_Number.count+=1
         return File_Number.count
-
 class Emergency(smach.State):
 
     def __init__(self):
@@ -29,29 +28,30 @@ class Start(smach.State):
         self.wp=Wp.File_Reader()
         self.emsub=rospy.Subscriber('switch',Bool,self.emCb)
         self.em=True
-        self.number=File_Number()
+        self.file=File_Number()
+        self.number=self.file.Count()
         self.result=False
     def emCb(self,msg):
+        
         self.em=msg.data
      
     def execute(self,data):
-        rospy.sleep(0.1)
-        return 'start'
-
-        """ 
+        rospy.sleep(0.5)
         if not self.em:
-            wp.shutdown()
+            self.wp.shutdown()
             return 'emergency'
         else :
+            self.wp.route0(self.number)
+            result=self.wp.route0(self.number)
+            rospy.loginfo(self.number)
             return 'start'
-            wp.route0(self.number)
-            result=wp.route0(self.number)
 
             if result:
                 return 'next'
             else:
                 return 'start'
-        """
+            rospy.loginfo("3")
+        
 class main():
     rospy.init_node('waypoint_publisher')
     sm=smach.StateMachine(outcomes=['outcomes']) 
@@ -69,6 +69,12 @@ class main():
 
 if __name__=='__main__':
     main()
-
+    """
+    f=Wp.File_Reader()
+    b=File_Number()
+    num=b.Count()
+    f.reading0(num)
+    print(f.reading0(num))
+    """
 
 

@@ -5,11 +5,9 @@
         <arg name='map' default="$(find nhk_2020)/map/map.yaml"/>
         <node name="map_server" pkg="map_server" type="map_server" args="$(arg map)">
         </node>
-    
     <!--*************************************************-->  
-
-        <node pkg="tf" name="base2lidar" type="static_transform_publisher" args="0 0 0.1 0 0 0 base_link lidar_link 100"/>
-        <node pkg="tf" name="map2odom" type="static_transform_publisher" args="0 0 0 0 0 0 map odom 100"/>
+        <node pkg="tf" name="odom_map_broadcaster" type="static_transform_publisher" args="0 0 0 0 0 0 odom map 100"/>
+    
     
     <!--move_base************************************************-->    
         
@@ -22,6 +20,7 @@
         <rosparam file="$(find nhk_2020)/param/costmap_common_params.yaml" command="load" ns="loacl_costmap" />        
         <rosparam file="$(find nhk_2020)/param/local_costmap_params.yaml" command="load" />
         <rosparam file="$(find nhk_2020)/param/global_costmap_params.yaml" command="load" />
+        <rosparam file="$(find nhk_2020)/param/base_local_planner_params.yaml" command="load" />
         
 
         <remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>
