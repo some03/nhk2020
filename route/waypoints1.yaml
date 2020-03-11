@@ -1,15 +1,15 @@
 waypoints:
   - position:
-      x: 10 
-      y: 0.02
+      x: 3 
+      y: 3 
       z: 0
       qx: 0
       qy: 0
       qz: 0
       qw: 1
   - position:
-      x: 10
-      y: 0.033
+      x: 3
+      y: 3
       z: 0
       qx: 0
       qy: 0

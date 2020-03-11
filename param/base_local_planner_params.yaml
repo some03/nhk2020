@@ -1,7 +1,10 @@
+controller_frequency: 3.0
+recovery_behavior_enabled: false
+clearing_rotaion_allowed: false
+
 TrajectryPlannerROS:
-    controller_frequency: 5.0
-    max_vel_x:  300.0
-    min_vel_x: -300.0 
+    max_vel_x: 200.0
+    min_vel_x: -200.0 
     max_rostational_vel: 1.0
     min_in_place_vel_theta: 0.5
     acc_lim_x: 2.5
@@ -10,11 +13,12 @@ TrajectryPlannerROS:
     holonomic_robot: true
     yaw_goal_tolerance: 0.5
     xy_goal_tolerance:  0.5 
-    pdist_scale: 0.8
-    gdist_scale: 0.4
+    pdist_scale: 0.4
+    gdist_scale: 0.8
     sim_time: 1.0
     dwa: false
-    meter_scoring: false
+    meter_scoring: true
+    publish_cost_grid_pc: false
 
    
 

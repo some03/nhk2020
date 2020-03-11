@@ -5,7 +5,8 @@ loacl_costmap:
     publish_frequency: 1.0
     static_map: false
     rolling_windows: true
-    width: 300.0
-    height: 300.0
+    width: 6.0
+    height: 6.0
     resolution: 0.1
     transform_tolerance: 5.0 
+    metert_scoring: true
