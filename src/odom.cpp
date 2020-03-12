@@ -152,8 +152,8 @@ void Odom::publish(){
    vy=A*sin(th)+B*cos(th);
    vth=th;
 
-    x+=x;
-    y+=y;
+    x+=vx;
+    y+=vy;
     
     dt+=0.2;
    //なんで？

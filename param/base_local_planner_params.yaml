@@ -2,9 +2,9 @@ controller_frequency: 3.0
 recovery_behavior_enabled: false
 clearing_rotaion_allowed: false
 
-TrajectryPlannerROS:
-    max_vel_x: 200.0
-    min_vel_x: -200.0 
+TrajectoryPlannerROS:
+    max_vel_x: 2.5
+    min_vel_x: -2.5 
     max_rostational_vel: 1.0
     min_in_place_vel_theta: 0.5
     acc_lim_x: 2.5
