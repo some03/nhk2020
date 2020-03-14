@@ -30,8 +30,8 @@ class Omni{
 			
             void mtgo(int num,float speed);
 			float r=0.05;
-			float limit=190;
-            int th;
+			float limit=170;
+            int th=0;
 
             double qx,qy,qz,qw;
             double roll,pitch,yaw;
@@ -63,20 +63,30 @@ void Omni::cmdcb(const geometry_msgs::Twist::ConstPtr& mg){
 		float x=linear.x;
 		float y=linear.y;
 		float z=angular.z;
-		float m[4];
-		/*m[0]=-sqrt(2)/2*x+sqrt(2)/2*y+r*z;
+        float  m[4];
+        if(x<8||y<8){
+            float  x=linear.x*100;
+            float  y=linear.y*100;
+            float  z=yaw;
+        }
+        if(x>=8||y>=8){
+		    float x=linear.x;
+		    float y=linear.y;
+		    float z=angular.z;
+        }
+		m[0]=-sqrt(2)/2*x+sqrt(2)/2*y+r*z;
 		m[1]=sqrt(2)/2*x+sqrt(2)/2*y+r*z;
 		m[2]=sqrt(2)/2*x-sqrt(2)/2*y+r*z;
 		m[3]=-sqrt(2)/2*x-sqrt(2)/2*y+r*z;
+       /* 
+        th=0;
+
+        m[0]=-r*x*cos(th*PI/4)+r*y*sin(th*PI/4)+r*z;
+        m[1]=r*x*cos(th*PI*3/4)+r*y*sin(th*PI/4)+r*z;
+        m[2]=r*x*cos(th*PI*3/4)+r*y*sin(th*PI*3/4)+r*z;
+        m[3]=-r*x*cos(th*PI/4)+r*y*sin(th*PI*3/4)+r*z;
+
         */
-        th=yaw;
-
-        m[0]=-r*x*cos(th+PI/4)+r*y*sin(th+PI/4)+r*z;
-        m[1]=r*x*cos(th+PI*3/4)+r*y*sin(th+PI/4)+r*z;
-        m[2]=r*x*cos(th+PI*3/4)+r*y*sin(th+PI*7/4)+r*z;
-        m[3]=-r*x*cos(th+PI/4)+r*y*sin(th+PI*7/4)+r*z;
-
-
 		if(m[0]>=0)m[0]=std::min(m[0],limit);
 		else m[0]=std::max(m[0],-limit);
 		if(m[1]>=0)m[1]=std::min(m[1],limit);
@@ -86,7 +96,6 @@ void Omni::cmdcb(const geometry_msgs::Twist::ConstPtr& mg){
 		if(m[3]>=0)m[3]=std::min(m[3],limit);
 		else m[3]=std::max(m[3],-limit);
 
-        std::cout<<m[0];
 
 		for(int i=0;i<4;i++)mtgo(i,m[i]);
 

@@ -235,3 +235,5 @@ target_link_libraries(odometry_publisher ${catkin_LIBRARIES})
 add_executable(odom_listener  route/odom_listener.cpp)
 target_link_libraries(odom_listener ${catkin_LIBRARIES})
 
+add_executable(laser_scan_publisher  src/fake_laser.cpp)
+target_link_libraries(laser_scan_publisher ${catkin_LIBRARIES})

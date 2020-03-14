@@ -60,6 +60,7 @@ class File_Reader:
             self.pose.target_pose.pose.orientation.y=wp[i]['position']['qy']
             self.pose.target_pose.pose.orientation.z=wp[i]['position']['qz']
             self.pose.target_pose.pose.orientation.w=wp[i]['position']['qw']
+            self.pose.target_pose.header.stamp=rospy.Time.now()
             self.client.send_goal(self.pose)
             """
             while True:

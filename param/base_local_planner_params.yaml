@@ -2,25 +2,20 @@ controller_frequency: 3.0
 recovery_behavior_enabled: false
 clearing_rotaion_allowed: false
 
-TrajectoryPlannerROS:
-    max_vel_x: 2.5
-    min_vel_x: -2.5 
-    max_rostational_vel: 1.0
-    min_in_place_vel_theta: 0.5
-    acc_lim_x: 2.5
-    acc_lim_y: 2.5
-    acc_lim_theta: 3.5
-    holonomic_robot: true
-    yaw_goal_tolerance: 0.5
-    xy_goal_tolerance:  0.5 
-    pdist_scale: 0.4
-    gdist_scale: 0.8
-    sim_time: 1.0
-    dwa: false
-    meter_scoring: true
-    publish_cost_grid_pc: false
-
-   
-
-
-
+max_vel_x: 2.5
+min_vel_x: -2.5 
+max_vel_y: 2.5
+min_vel_y: -2.5 
+ax_rotational_vel: 1.0
+min_in_place_vel_theta: 0.5
+acc_lim_x: 2.5
+acc_lim_y: 2.5
+acc_lim_theta: 3.5
+holonomic_robot: true 
+yaw_goal_tolerance: 1.5
+xy_goal_tolerance:  1.5 
+pdist_scale: 0.1
+gdist_scale: 0.8
+sim_time: 3.0
+dwa: false 
+meter_scoring: false

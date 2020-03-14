@@ -2,5 +2,7 @@
  	<node pkg="nhk_2020" type="odometry_publisher" name="odometry_publisher" output="screen">
     </node>
     <node pkg="nhk_2020" type="Omni" name="Omni" output="screen">
+    </node>
+    <node pkg="nhk_2020" type="laser_scan_publisher" name="laser_scan_publisher" output="screen">
   	</node>
  </launch> 

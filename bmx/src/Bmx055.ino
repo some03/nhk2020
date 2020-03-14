@@ -13,7 +13,7 @@ Madgwick Md;
 geometry_msgs::Twist imuMsg;
 //grometry_msgs::Vector3 imuMg;
 sensor_msgs::Imu imuMg;
-sensor_msgs::MagneticField magMg;
+sensor_msgs::MagneticField  magMg;
 
 //geometry_msgs::Vector3Stamped magMg;
 ros::Publisher imuPb("imu/data_raw",&imuMg);
@@ -64,15 +64,15 @@ void loop()
   imuPb.publish(&imuMg);
   nh.spinOnce();
  */ 
-  imuMg.header.frame_id="imu_link";  
   imuMg.header.stamp=nh.now();
+  imuMg.header.frame_id="imu";
   imuMg.linear_acceleration.x=xAccl;
   imuMg.linear_acceleration.y=yAccl;
   imuMg.linear_acceleration.z=zAccl;
 
-  imuMg.angular_velocity.x=xGyro*0.05;
-  imuMg.angular_velocity.y=yGyro*0.05;
-  imuMg.angular_velocity.z=zGyro*0.05;
+  imuMg.angular_velocity.x=xGyro*0.02;
+  imuMg.angular_velocity.y=yGyro*0.02;
+  imuMg.angular_velocity.z=zGyro*0.02;
 
 
   imuPb.publish(&imuMg);
@@ -83,8 +83,8 @@ void loop()
   
   BMX055_Mag();
  
-  magMg.header.frame_id="imu_link";
   magMg.header.stamp=nh.now();
+  magMg.header.frame_id="imu";
   magMg.magnetic_field.x=xMag;
   magMg.magnetic_field.y=yMag;
   magMg.magnetic_field.z=zMag;

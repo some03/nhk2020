@@ -9,8 +9,8 @@
 
 
 USB Usb;
-BTD Btd(&Usb);
-PS3BT PS3(&Btd);
+//BTD Btd(&Usb);
+PS3USB PS3(&Usb);
 
 int direction(int x, int y) {
   double deg , rad;
@@ -21,7 +21,7 @@ int direction(int x, int y) {
   deg = rad * 180.0 / (atan(1.0) * 4.0);
   if (abs(x) > 16 || abs(y) > 16) {
     deg += 180.0;
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 16; i++) {
       if (deg >= 0.0 + (i * 22.5) && deg < 22.5 + (i * 22.5)) {//分割数を指定
         pattern = i + 1;
       }
@@ -100,10 +100,10 @@ void loop(){
 		double cwy=-(ly-140)*r;//-(127-(abs(ly-256)));
 		double ccwx=(lx-115)*r;//abs(-50+(lx-128))*0.6;
 		double ccwy=abs(ly-115)*r;//abs(-127-(abs(ly-235)))*0.5;
-        double fr=sqrt(pow(cwx,2)+pow(cwy,2));
-        double fl=sqrt(pow(ccwx,2)+pow(cwy,2));
-        double bl=sqrt(pow(ccwx,2)+pow(ccwy,2));
-        double br=sqrt(pow(cwx,2)+pow(ccwy,2));
+        double fr=sqrt(pow(cwx,2)+pow(cwy,2))*0.8;
+        double fl=sqrt(pow(ccwx,2)+pow(cwy,2))*0.8;
+        double bl=sqrt(pow(ccwx,2)+pow(ccwy,2))*0.8;
+        double br=sqrt(pow(cwx,2)+pow(ccwy,2))*0.8;
 
         double rcwx=(rx-140)*r;
         double rccwx=abs(rx-115)*r;
@@ -118,6 +118,7 @@ void loop(){
 						mg.linear.y=0;
 						mg.angular.z=0;
                         if(!manual)ord_pub.publish(&mg);
+                        
 						break;
 					case 1:
 					case 16:
@@ -130,8 +131,8 @@ void loop(){
 					case 2:
 					case 3:
                         //left
-						mg.linear.x=bl;
-						mg.linear.y=bl;//sqrt(pow(cwx,2)+pow(cwy,2));
+						mg.linear.x=-bl;
+						mg.linear.y=-bl;//sqrt(pow(cwx,2)+pow(cwy,2));
 						mg.angular.z=0;
 						if(!manual)ord_pub.publish(&mg);
 						break;
@@ -139,15 +140,15 @@ void loop(){
 					case 5:
                         //right
 						mg.linear.x=0;
-						mg.linear.y=ccwy;
+						mg.linear.y=-ccwy;
 						mg.angular.z=0;
 						if(!manual)ord_pub.publish(&mg);
 						break;
 
 					case 6:
 					case 7:
-						mg.linear.x=br;
-						mg.linear.y=br;
+						mg.linear.x=-br;
+						mg.linear.y=-br;
 						mg.angular.z=0;
 						if(!manual)ord_pub.publish(&mg);
 						break;
@@ -168,7 +169,7 @@ void loop(){
 					case 12:
 					case 13:
 						mg.linear.x=0;
-						mg.linear.y=cwy;
+						mg.linear.y=ccwy;
 						mg.angular.z=0;
 						if(!manual)ord_pub.publish(&mg);
 						break;

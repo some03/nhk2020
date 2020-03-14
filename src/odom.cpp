@@ -134,10 +134,10 @@ void Odom::publish(){
 
 //--各オムニホイールの角速度----------------------------------//
 
-    v0=((enc0*2*PI*R)/(PULSE*dt*GR));
-    v1=((enc1*2*PI*R)/(PULSE*dt*GR));
-    v2=((enc2*2*PI*R)/(PULSE*dt*GR));
-    v3=((enc3*2*PI*R)/(PULSE*dt*GR));
+    v0=((enc0*2*PI*R)/(PULSE*dt*0.01));
+    v1=((enc1*2*PI*R)/(PULSE*dt*0.01));
+    v2=((enc2*2*PI*R)/(PULSE*dt*0.01));
+    v3=((enc3*2*PI*R)/(PULSE*dt*0.01));
 //----------------------------------------------------------//
 
 //------オドメトリの計算------------------------------------//
@@ -146,7 +146,7 @@ void Odom::publish(){
 
    
    
-   th+=yaw;
+   th=yaw;
    
    vx=A*cos(th)-B*sin(th);
    vy=A*sin(th)+B*cos(th);
@@ -160,9 +160,9 @@ void Odom::publish(){
 
    
    /*****デバッグ**********/
-   ROS_INFO("vx: %lf",vx);
-   ROS_INFO("vy: %lf",vy);
-   ROS_INFO("vth: %lf",vth);
+   ROS_INFO("vx: %d",v0);
+   ROS_INFO("vy: %d",v1);
+   ROS_INFO("vth: %d",v2);
 
    ROS_INFO("X: %lf",x);
    ROS_INFO("Y: %lf",y);
