@@ -65,8 +65,8 @@ void Omni::cmdcb(const geometry_msgs::Twist::ConstPtr& mg){
 		float z=angular.z;
         float  m[4];
         if(x<8||y<8){
-            float  x=linear.x*100;
-            float  y=linear.y*100;
+            float  x=linear.x*150;
+            float  y=linear.y*150;
             float  z=yaw;
         }
         if(x>=8||y>=8){

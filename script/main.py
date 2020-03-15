@@ -10,7 +10,7 @@ import rospy
 
 
 class File_Number():
-    count=0;
+    count=-1;
     def Count(self):
         File_Number.count+=1
         return File_Number.count

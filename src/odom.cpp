@@ -59,7 +59,7 @@ class Odom{
         double x,y,th;
         double vx,vy,vth;
         double roll,pitch,yaw;
-        int v0,v1,v2,v3;
+        long long v0,v1,v2,v3;
     
         double dt;
         
@@ -133,11 +133,18 @@ void Odom::publish(){
     current_time=ros::Time::now();
 
 //--各オムニホイールの角速度----------------------------------//
-
-    v0=((enc0*2*PI*R)/(PULSE*dt*0.01));
-    v1=((enc1*2*PI*R)/(PULSE*dt*0.01));
-    v2=((enc2*2*PI*R)/(PULSE*dt*0.01));
-    v3=((enc3*2*PI*R)/(PULSE*dt*0.01));
+/*
+    v0=((enc0*2*PI*R)/(PULSE*dt*0.1));
+    v1=((enc1*2*PI*R)/(PULSE*dt*0.06));
+    v2=((enc2*2*PI*R)/(PULSE*dt*0.06));
+    v3=((enc3*2*PI*R)/(PULSE*dt*0.06));
+ */  
+    
+    v0=enc0*0.0005;
+    v1=enc1*0.0005;
+    v2=enc2*0.0005;
+    v3=enc3*0.0005;
+    
 //----------------------------------------------------------//
 
 //------オドメトリの計算------------------------------------//
@@ -152,17 +159,17 @@ void Odom::publish(){
    vy=A*sin(th)+B*cos(th);
    vth=th;
 
-    x+=vx;
-    y+=vy;
+    x=vx;
+    y=vy;
     
     dt+=0.2;
    //なんで？
 
    
    /*****デバッグ**********/
-   ROS_INFO("vx: %d",v0);
-   ROS_INFO("vy: %d",v1);
-   ROS_INFO("vth: %d",v2);
+   ROS_INFO("vx: %f",vx);
+   ROS_INFO("vy: %f",vy);
+   ROS_INFO("vth: %f",vth);
 
    ROS_INFO("X: %lf",x);
    ROS_INFO("Y: %lf",y);

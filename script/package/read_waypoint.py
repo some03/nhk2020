@@ -6,6 +6,7 @@ import rospy
 from nav_msgs.msg import Odometry
 import math
 import tf2_ros
+import tf
 from geometry_msgs.msg import PoseStamped
 import actionlib
 from move_base_msgs.msg import MoveBaseAction,MoveBaseGoal
@@ -14,21 +15,20 @@ from move_base_msgs.msg import MoveBaseAction,MoveBaseGoal
 #[""waipoint"][num][position][x/y/z]
 #[finish_pose][header/position/orientation][value]
 sys.path.append(str(Path('__file__').resolve().parent.parent))
-data_raw='../route/'
+data_raw='../Route/'
 
 class File_Reader:
     def __init__(self):
        
-        self.tfBuffer=tf2_ros.Buffer()
-        self.listener=tf2_ros.TransformListener(self.tfBuffer)
+        self.listener=tf.TransformListener() 
         self.client=actionlib.SimpleActionClient('move_base',MoveBaseAction)
         self.client.wait_for_server()
 
         self.pose=MoveBaseGoal() 
         self.pose.target_pose.header.frame_id='map'
-        self.tfBuffer.lookup_transform('map','base_link',rospy.Time(),rospy.Duration(4.0))
 
-        
+        self.listener.waitForTransform("map", "base_link", rospy.Time(), rospy.Duration(4.0))
+        self.distance=0 
 
 
     def reading0(self,num):
@@ -62,18 +62,21 @@ class File_Reader:
             self.pose.target_pose.pose.orientation.w=wp[i]['position']['qw']
             self.pose.target_pose.header.stamp=rospy.Time.now()
             self.client.send_goal(self.pose)
-            """
+            
             while True:
                 now=rospy.Time.now() 
-                self.tfBuffer.lookup_transform('map','base_link',now,rospy.Duration(4.0))
-                position,quaternion=self.tfBuffer.lookup_transform("map","base_link",now)
-                distance=math.sqrt(((position[0]-pose.target_pose.pose.position.x)**2+(position[1]-pose.target_pose.pose.position.y)**2))
-                if(distace<=1):
-                    ropy.loginfo("next!")
+                self.listener.waitForTransform("map", "base_link",now,rospy.Duration(4.0))
+                position,quaternion=self.listener.lookupTransform("map","base_link",now)
+                self.distance=math.sqrt(((position[0]-self.pose.target_pose.pose.position.x)**2+(position[1]-self.pose.target_pose.pose.position.y)**2))
+                if(self.distance<=1):
+                    rospy.loginfo("next!")
                     break
                 else:
                     rospy.sleep(0.5)
-            """ 
+             
+        suceeded=self.client.wait_for_result(rospy.Duration(50));
+        if suceeded:
+            return True;
     def route1(self,num):
 
         pose=PoseStamped()

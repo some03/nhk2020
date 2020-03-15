@@ -1,15 +1,16 @@
 <launch>
-<!--arduino due-->
-  <node pkg="rosserial_python" type="serial_node.py" name="arduinoDue">
-   	<param name="port" value="/dev/ttyACM0"/>
+  <!--for navigation-->
+  <include file="$(find nhk_2020)/launch/run.launch"/>
+  <node pkg="rosserial_python" type="serial_node.py" name="imu">
+  <param name="port" value="/dev/ttyACM1"/>
  </node>
- 	
-	<node pkg="nhk_2020" type="Run" name="Run" output="screen">
-   </node>
-  	<arg name="kp" default="0.3"/>
-  	<rosparam param="kp" subst_value="True">$(arg kp)</rosparam>
-   <node pkg="nhk_2020" type="Omni" name="Omni" output="screen">
-  	</node>
-   	<node pkg="nhk_2020" type="State.py" name="robot_order" output="screen">
-  	</node>
- </launch> 
+  <node pkg="imu_filter_madgwick" type="imu_filter_node" name="madgwick_filter_node">
+  <param name="fixed_frame" value="odom"/>
+  <param name="world_frame" value="enu"/>
+  <param name="use_magnetic_field_msg" value="true"/>
+  </node>
+    <node pkg="rosserial_python" type="serial_node.py" name="PS3">
+        <param name="port" value="/dev/ttyACM0"/>
+    </node>
+
+</launch>

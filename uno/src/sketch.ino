@@ -9,8 +9,9 @@
 
 
 USB Usb;
-//BTD Btd(&Usb);
-PS3USB PS3(&Usb);
+BTD Btd(&Usb);
+PS3BT PS3(&Btd);
+
 
 int direction(int x, int y) {
   double deg , rad;
@@ -131,8 +132,8 @@ void loop(){
 					case 2:
 					case 3:
                         //left
-						mg.linear.x=-bl;
-						mg.linear.y=-bl;//sqrt(pow(cwx,2)+pow(cwy,2));
+						mg.linear.x=-bl*0.5;
+						mg.linear.y=-bl*0.5;//sqrt(pow(cwx,2)+pow(cwy,2));
 						mg.angular.z=0;
 						if(!manual)ord_pub.publish(&mg);
 						break;
@@ -147,8 +148,8 @@ void loop(){
 
 					case 6:
 					case 7:
-						mg.linear.x=-br;
-						mg.linear.y=-br;
+						mg.linear.x=br*0.5;
+						mg.linear.y=-br*0.5;
 						mg.angular.z=0;
 						if(!manual)ord_pub.publish(&mg);
 						break;
@@ -161,8 +162,8 @@ void loop(){
 						break;
 					case 10:
 					case 11:
-						mg.linear.x=fr;
-						mg.linear.y=fr;
+						mg.linear.x=fr*0.5;
+						mg.linear.y=fr*0.5;
 						mg.angular.z=0;
 						if(!manual)ord_pub.publish(&mg);
 						break;
@@ -175,8 +176,8 @@ void loop(){
 						break;
 					case 14:
 					case 15:
-						mg.linear.x=fl;
-						mg.linear.y=fl;
+						mg.linear.x=-fl*0.5;
+						mg.linear.y=fl*0.5;
 						mg.angular.z=0;
 						if(!manual)ord_pub.publish(&mg);
 						break;
@@ -195,17 +196,29 @@ void loop(){
 						    break;
                 
            				case 1:
-           				case 8:
+           				case 12:
+           				case 13:
+           				case 14:
+           				case 15:
+           				case 16:
+           				case 2:
+           				case 3:
+           				case 4:
                				mg.linear.x=0;
                 			mg.linear.y=0;
-                			mg.angular.z=-rccwx*0.003;
+                			mg.angular.z=-rccwx*1.8;
                 			if(!manual)ord_pub.publish(&mg);
                 			break;
-            			case 4:
             			case 5:
+            			case 6:
+            			case 7:
+            			case 8:
+            			case 9:
+            			case 10:
+            			case 11:
                 			mg.linear.x=0;
                 			mg.linear.y=0;
-                			mg.angular.z=rcwx*0.003;
+                			mg.angular.z=rcwx*1.8;
                				if(!manual) ord_pub.publish(&mg);
                 			break;
                 		}
