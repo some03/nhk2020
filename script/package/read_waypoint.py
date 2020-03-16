@@ -85,10 +85,9 @@ class File_Reader:
                 
                 if self.mg.pose.position.y<=1:
                     self.mg.pose.position.y=0
-                self.distance=abs(self.mg.pose.position.x-self.X+self.mg.pose.position.y-self.Y)
-                
+                self.distance=abs(self.mg.pose.position.y-self.Y)
 
-                if(self.distance<=1 ):
+                if(self.distance<=0.5):
                     rospy.loginfo(self.distance)
                     rospy.loginfo("next!")
                     break

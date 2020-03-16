@@ -89,7 +89,7 @@ void Odom_listener::save(){
     
     for(int i=0;i<waypoint.size();i++){
        ofs<<"  "<<"- position:"<<std::endl;        
-       ofs<<"      x: "<<waypoint[i].position.x<<std::endl;
+       ofs<<"      x: "<<waypoint[i].position.x*0.5<<std::endl;
        ofs<<"      y: "<<waypoint[i].position.y<<std::endl;
        ofs<<"      z: "<<waypoint[i].position.z<<std::endl;
        ofs<<"      qx: "<<waypoint[i].orientation.x<<std::endl;

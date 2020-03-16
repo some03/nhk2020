@@ -40,6 +40,9 @@ class Cmd{
         double nowy=0;
         double nowz=0;
 
+        double count=0;
+        double  mxspd=70;
+        
 
 };
 Cmd::Cmd(){
@@ -47,26 +50,41 @@ Cmd::Cmd(){
 }
 
 void Cmd::goalCb(const geometry_msgs::PoseStamped& msg){
-
+        
         geometry_msgs::Twist mg;
         x=msg.pose.position.x;
 		y=msg.pose.position.y;
 		z=msg.pose.position.z;
-        if(x<0)x=0;
-        if(y<0)y=0;
-        mg.linear.x=40*(x-nowx);
-        mg.linear.y=40*(y-nowy);
-        mg.angular.z=40*(z-nowz);
+        //if((x>0&&x<1)||(x<&&x>-5))x=0;
+        //if(y<0)y=0;
         
+        mg.linear.x=50*(x-(nowx*0.1))/count;
+        mg.linear.y=70*(y-nowy)/count;
+        mg.angular.z=70*(z-nowz)/count;
+       
+        std::cout<<x<<std::endl;
+        std::cout<<nowx<<std::endl;
+        /*
         double distance=sqrt(pow((x-nowx),2)+(pow((y-nowy),2)));
-        if(distance<0.5){
-
+        if(distance<0.1){
             mg.linear.x=0;
             mg.linear.y=0;
             mg.angular.z=0;
-        }
+        }*/
+        if(mg.linear.x>=0)mg.linear.x=std::min(mg.linear.x,mxspd);
+       	else mg.linear.x=std::max(mg.linear.x,-mxspd);
+
+
+        if(mg.linear.y>=0)mg.linear.y=std::min(mg.linear.y,mxspd);
+        else mg.linear.y=std::max(mg.linear.y,-mxspd);
+
+        if(mg.linear.z>=0)mg.angular.z=std::min(mg.angular.z,mxspd);
+        else mg.angular.z=std::max(mg.angular.z,-mxspd);
+
+
 
         ord_pub.publish(mg);
+        count+=0.1;
 
 	    
       
@@ -102,7 +120,11 @@ void Cmd::publish(const nav_msgs::Odometry& msg){
 int main(int argc,char**argv){
 		ros::init(argc,argv,"pub_cmd");
 		Cmd cmd;
-        ros::spin();
+        ros::Rate loop_rate(10);
+		while(ros::ok()){
+			ros::spinOnce();
+			loop_rate.sleep();
+		}
 		return 0;
 }
 
