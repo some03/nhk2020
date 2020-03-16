@@ -27,6 +27,7 @@ class Start(smach.State):
     
         self.wp=Wp.File_Reader()
         self.emsub=rospy.Subscriber('switch',Bool,self.emCb)
+        self.resultsub=rospy.Subscriber('result',Bool,self.reCb)
         self.em=True
         self.file=File_Number()
         self.number=self.file.Count()
@@ -34,6 +35,8 @@ class Start(smach.State):
     def emCb(self,msg):
         
         self.em=msg.data
+    def reCb(self,mg):
+        self.result=mg.data
      
     def execute(self,data):
         rospy.sleep(0.5)

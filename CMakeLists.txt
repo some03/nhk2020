@@ -237,3 +237,6 @@ target_link_libraries(odom_listener ${catkin_LIBRARIES})
 
 add_executable(laser_scan_publisher  src/fake_laser.cpp)
 target_link_libraries(laser_scan_publisher ${catkin_LIBRARIES})
+
+add_executable(pub_cmd  src/cmd_vel.cpp)
+target_link_libraries(pub_cmd ${catkin_LIBRARIES})

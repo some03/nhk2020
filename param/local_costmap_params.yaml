@@ -1,5 +1,5 @@
 local_costmap:
-  global_frame: map 
+  global_frame: odom 
   robot_base_frame: base_link
   update_frequency: 10.0
   publish_frequency: 10.0
@@ -9,6 +9,6 @@ local_costmap:
   height: 20.0
   resolution: 0.1
   transform_tolerance: 1.0 
-  meter_scoring: true
+  meter_scoring: false 
   origin_x: -10.0
   origin_y: -2.0

@@ -88,9 +88,13 @@ void setup(){
     mg.linear.x=0;
     mg.linear.y=0;
     mg.angular.z=0;
+
+    pinMode(22,INPUT);
 }
 void loop(){
 	Usb.Task();
+    digitalRead(22);
+    if()
   if(PS3.PS3Connected||PS3.PS3NavigationConnected){
 
 		double lx = PS3.getAnalogHat(LeftHatX);

@@ -56,10 +56,11 @@ class Odom{
         long long old_enc2;
         long long old_enc3;
         
-        double x,y,th;
-        double vx,vy,vth;
+        double x,y;
+        double vx,vy;
         double roll,pitch,yaw;
         long long v0,v1,v2,v3;
+        double  th,vth;
     
         double dt;
         
@@ -133,12 +134,12 @@ void Odom::publish(){
     current_time=ros::Time::now();
 
 //--各オムニホイールの角速度----------------------------------//
-/*
+    /*
     v0=((enc0*2*PI*R)/(PULSE*dt*0.1));
     v1=((enc1*2*PI*R)/(PULSE*dt*0.06));
     v2=((enc2*2*PI*R)/(PULSE*dt*0.06));
     v3=((enc3*2*PI*R)/(PULSE*dt*0.06));
- */  
+    */  
     
     v0=enc0*0.0005;
     v1=enc1*0.0005;

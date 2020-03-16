@@ -30,7 +30,7 @@ class Omni{
 			
             void mtgo(int num,float speed);
 			float r=0.05;
-			float limit=170;
+			float limit=110;
             int th=0;
 
             double qx,qy,qz,qw;
@@ -64,17 +64,9 @@ void Omni::cmdcb(const geometry_msgs::Twist::ConstPtr& mg){
 		float y=linear.y;
 		float z=angular.z;
         float  m[4];
-        if(x<8||y<8){
-            float  x=linear.x*150;
-            float  y=linear.y*150;
-            float  z=yaw;
-        }
-        if(x>=8||y>=8){
-		    float x=linear.x;
-		    float y=linear.y;
-		    float z=angular.z;
-        }
-		m[0]=-sqrt(2)/2*x+sqrt(2)/2*y+r*z;
+		
+        
+        m[0]=-sqrt(2)/2*x+sqrt(2)/2*y+r*z;
 		m[1]=sqrt(2)/2*x+sqrt(2)/2*y+r*z;
 		m[2]=sqrt(2)/2*x-sqrt(2)/2*y+r*z;
 		m[3]=-sqrt(2)/2*x-sqrt(2)/2*y+r*z;
