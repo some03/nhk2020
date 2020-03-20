@@ -8,6 +8,7 @@ import math
 import tf2_ros
 import tf
 from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import Pose2D
 from nav_msgs.msg import Odometry
 import actionlib
 from move_base_msgs.msg import MoveBaseAction,MoveBaseGoal
@@ -28,11 +29,12 @@ class File_Reader:
         #self.listener.waitForTransform("map", "base_link", rospy.Time(), rospy.Duration(4.0))
         self.distance=0 
         self.distance2=0 
-        self.cmd_pub=rospy.Publisher("goal",PoseStamped)
+        self.goal_pub=rospy.Publisher("goal",Pose2D)
         self.X=0
         self.Y=0
         self.Z=0
-        self.mg=PoseStamped()
+        self.reach=False
+        self.mg=Pose2D()
 
 
     def reading0(self,num):
@@ -51,22 +53,22 @@ class File_Reader:
         self.X=mg.pose.pose.position.x
         self.Y=mg.pose.pose.position.y
         self.Z=mg.pose.pose.position.z
+        
+    
+    
     
     def route0(self,num):
-
         #pose=PoseStamped()
-
         y=self.reading0(num)
-        
         wp=y['waypoints']
 
         for i in range(len(wp)): 
             #print(i)
-            self.mg.pose.position.x=wp[i]['position']['x']        
-            self.mg.pose.position.y=wp[i]['position']['y']        
-            self.mg.pose.position.z=wp[i]['position']['z']        
+            self.mg.x=wp[i]['position']['x']        
+            self.mg.y=wp[i]['position']['y']        
+            self.mg.theta=wp[i]['position']['z']        
             rospy.loginfo(i)
-            self.cmd_pub.publish(self.mg)
+            self.goal_pub.publish(self.mg)
             """  
             self.pose.target_pose.pose.orientation.x=wp[i]['position']['qx']
             self.pose.target_pose.pose.orientation.y=wp[i]['position']['qy']
@@ -80,12 +82,7 @@ class File_Reader:
              
             while True:
                 now=rospy.Time.now() 
-                if self.mg.pose.position.x<=1:
-                    self.mg.pose.position.x=0
-                
-                if self.mg.pose.position.y<=1:
-                    self.mg.pose.position.y=0
-                self.distance=abs(self.mg.pose.position.y-self.Y)
+                self.distance=abs((math.hypot(self.mg.x,self.mg.y))-(math.hypot(self.X,self.Y)))
 
                 if(self.distance<=0.5):
                     rospy.loginfo(self.distance)
@@ -94,9 +91,7 @@ class File_Reader:
                 else:
                     rospy.sleep(0.3)
                     rospy.loginfo(self.distance)
-             
-        return True;
-        rospy.sleep(2)
+        return True
         
     def route1(self,num):
 
@@ -137,6 +132,13 @@ class File_Reader:
             pose.pose.orientation.z=wp[i]['position']['qz']
             pose.pose.orientation.w=wp[i]['position']['qw']
             #print(pose)
+
+    def get_result(self):
+        if self.reach:
+            self.reach=False
+            return True
+        else:
+            rospy.sleep(0.5)
 
 if __name__=="__main__":
     pass

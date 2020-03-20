@@ -6,6 +6,7 @@ from std_msgs.msg import Float32
 from std_msgs.msg import Int32
 from std_msgs.msg import Bool
 from std_msgs.msg import Empty
+from subprocess import *
 import rospy
 
 
@@ -14,57 +15,41 @@ class File_Number():
     def Count(self):
         File_Number.count+=1
         return File_Number.count
-class Emergency(smach.State):
 
-    def __init__(self):
-        smach.State.__init__(self,outcomes=['emergency'])
-    def execute(self,data):
-        pass
+
+
+def emergency(msg):
+    rospy.loginfo("a")
+    kill_node(local_planner)
+    kill_node(main.py)
+emsub=rospy.Subscriber('switch',Bool,emergency)
+
 
 class Start(smach.State):
     def __init__(self):
-        smach.State.__init__(self,outcomes=['start','emergency','next'])
+        smach.State.__init__(self,outcomes=['start','next'])
     
         self.wp=Wp.File_Reader()
-        self.emsub=rospy.Subscriber('switch',Bool,self.emCb)
-        self.resultsub=rospy.Subscriber('result',Bool,self.reCb)
-        self.em=True
         self.file=File_Number()
         self.number=self.file.Count()
         self.result=False
-    def emCb(self,msg):
-        
-        self.em=msg.data
-    def reCb(self,mg):
-        self.result=mg.data
+        self.next=False
+    
      
     def execute(self,data):
         rospy.sleep(0.5)
-        if not self.em:
-            self.wp.shutdown()
-            return 'emergency'
-        else :
-            self.wp.route0(self.number)
-            result=self.wp.route0(self.number)
-            rospy.loginfo(self.number)
-            return 'start'
+        #result=self.wp.route0(self.number)
+        rospy.loginfo(self.number)
+        return 'next'
 
-            if result:
-                return 'next'
-            else:
-                return 'start'
-            rospy.loginfo("3")
         
 class main():
     rospy.init_node('waypoint_publisher')
     sm=smach.StateMachine(outcomes=['outcomes']) 
     with sm:
         smach.StateMachine.add('START',Start(),
-                                transitions={'emergency':'EMERGENCY',
-                                            'start':'START','next':'outcomes'})
+                                transitions={'start':'START','next':'outcomes'})
 
-        smach.StateMachine.add('EMERGENCY',Emergency(),
-                                transitions={'emergency':'EMERGENCY'})
         sis=smach_ros.IntrospectionServer('server_name',sm,'/SM_ROOT')
         sis.start()
         outcomes=sm.execute()
