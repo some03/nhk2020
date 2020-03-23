@@ -48,12 +48,14 @@ std_msgs::Bool Mg;
 std_msgs::Int32 ms;
 ros::Publisher go_pub("Go",&Mg);
 ros::Publisher sw_pub("switch",&msg);
-ros::Publisher ord_pub("cmd_vel",&mg);
+ros::Publisher ord_pub("ps3_cmd_vel",&mg);
 ros::Publisher try_pub("success",&Msg);
 ros::Publisher ct_pub("catch_ball",&Msg);
 ros::Publisher ml_pub("order",&ms);
+ros::Publisher start_pub("start",&msg);
 
-ros::Subscriber<std_msgs::Bool>manu("manual",ml_Cb);
+ros::Subscriber<std_msgs::Bool>manual_sub("manual",ml_Cb);
+
 
 void setup(){
     #if !defined(__MIPSEL__)
@@ -83,7 +85,7 @@ void setup(){
     nh.advertise(ct_pub);
     nh.advertise(go_pub);
     nh.advertise(ml_pub);
-    nh.subscribe(manu);
+    nh.subscribe(manual_sub);
 
     mg.linear.x=0;
     mg.linear.y=0;
@@ -94,8 +96,9 @@ void setup(){
 void loop(){
 	Usb.Task();
     digitalRead(22);
-    if()
-  if(PS3.PS3Connected||PS3.PS3NavigationConnected){
+    if(22==HIGH)msg.data=true,start_pub.publish(&msg);
+  
+    if(PS3.PS3Connected||PS3.PS3NavigationConnected){
 
 		double lx = PS3.getAnalogHat(LeftHatX);
 		double ly = PS3.getAnalogHat(LeftHatY);
@@ -113,8 +116,6 @@ void loop(){
         double rcwx=(rx-140)*r;
         double rccwx=abs(rx-115)*r;
             
-                     
-            
     
 		if (PS3.getAnalogHat(LeftHatX) > 137||PS3.getAnalogHat(LeftHatX) < 117|| PS3.getAnalogHat(LeftHatY) > 137|| PS3.getAnalogHat(LeftHatY) < 117){  
 				switch (direction(PS3.getAnalogHat(LeftHatX), PS3.getAnalogHat(LeftHatY))){
@@ -122,7 +123,7 @@ void loop(){
 						mg.linear.x=0;
 						mg.linear.y=0;
 						mg.angular.z=0;
-                        if(!manual)ord_pub.publish(&mg);
+                        ord_pub.publish(&mg);
                         
 						break;
 					case 1:
@@ -131,7 +132,7 @@ void loop(){
 						mg.linear.x=ccwx;
 						mg.linear.y=0;//sqrt(pow(cwx,2)+pow(cwy,2));
 						mg.angular.z=0;
-						if(!manual)ord_pub.publish(&mg);
+						ord_pub.publish(&mg);
 						break;
 					case 2:
 					case 3:
@@ -139,7 +140,7 @@ void loop(){
 						mg.linear.x=-bl*0.5;
 						mg.linear.y=-bl*0.5;//sqrt(pow(cwx,2)+pow(cwy,2));
 						mg.angular.z=0;
-						if(!manual)ord_pub.publish(&mg);
+						ord_pub.publish(&mg);
 						break;
 					case 4:
 					case 5:
@@ -147,7 +148,7 @@ void loop(){
 						mg.linear.x=0;
 						mg.linear.y=-ccwy;
 						mg.angular.z=0;
-						if(!manual)ord_pub.publish(&mg);
+						ord_pub.publish(&mg);
 						break;
 
 					case 6:
@@ -155,35 +156,35 @@ void loop(){
 						mg.linear.x=br*0.5;
 						mg.linear.y=-br*0.5;
 						mg.angular.z=0;
-						if(!manual)ord_pub.publish(&mg);
+						ord_pub.publish(&mg);
 						break;
 					case 8:
 					case 9:
 						mg.linear.x=cwx;
 						mg.linear.y=0;
 						mg.angular.z=0;
-						if(!manual)ord_pub.publish(&mg);
+						ord_pub.publish(&mg);
 						break;
 					case 10:
 					case 11:
 						mg.linear.x=fr*0.5;
 						mg.linear.y=fr*0.5;
 						mg.angular.z=0;
-						if(!manual)ord_pub.publish(&mg);
+						ord_pub.publish(&mg);
 						break;
 					case 12:
 					case 13:
 						mg.linear.x=0;
 						mg.linear.y=ccwy;
 						mg.angular.z=0;
-						if(!manual)ord_pub.publish(&mg);
+						ord_pub.publish(&mg);
 						break;
 					case 14:
 					case 15:
 						mg.linear.x=-fl*0.5;
 						mg.linear.y=fl*0.5;
 						mg.angular.z=0;
-						if(!manual)ord_pub.publish(&mg);
+						ord_pub.publish(&mg);
 						break;
                     default:
                         break;
@@ -196,7 +197,7 @@ void loop(){
 			    			mg.linear.x=0;
 						    mg.linear.y=0;
 						    mg.angular.z=0;
-						    if(!manual)ord_pub.publish(&mg);
+						    ord_pub.publish(&mg);
 						    break;
                 
            				case 1:
@@ -211,7 +212,7 @@ void loop(){
                				mg.linear.x=0;
                 			mg.linear.y=0;
                 			mg.angular.z=-rccwx*1.8;
-                			if(!manual)ord_pub.publish(&mg);
+                			ord_pub.publish(&mg);
                 			break;
             			case 5:
             			case 6:
@@ -223,19 +224,19 @@ void loop(){
                 			mg.linear.x=0;
                 			mg.linear.y=0;
                 			mg.angular.z=rcwx*1.8;
-               				if(!manual) ord_pub.publish(&mg);
+               				ord_pub.publish(&mg);
                 			break;
                 		}
-            }
+                    }
+                
             
         
 
 	  else{
-                
 			mg.linear.x=0;
 			mg.linear.y=0;
 			mg.angular.z=0;
-            if(!manual)ord_pub.publish(&mg);
+            ord_pub.publish(&mg);
 
 			if(PS3.getButtonPress(CIRCLE)){
 				Msg.data=true;

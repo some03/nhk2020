@@ -9,14 +9,15 @@
 #include <Arduino.h>
 #include "Motor.h"
 #include "Encoder.h"
+#include "try_machine.h"
 #include<std_msgs/Empty.h>
 Motor mo0(10,11);//9 8
-Motor mo1(8,12);//4 5
-Motor mo2(2,3);//7 6
-Motor mo3(7,6);
+Motor mo1(45,46);//7 6
+Motor mo2(9,8);//8 12
+Motor mo3(2,3);//4 5
 
 Encoder enc;
-
+Injection_machine inm;
 ros::NodeHandle nh;
 
 //call back
@@ -36,12 +37,16 @@ void resetCb(const std_msgs::Empty &mg){
 		Encoder::set();
 }
 
+void Actuator(const std_msgs::Int32& msg){
+        inm.inject(msg.data);
+}
 //subscriber
 ros::Subscriber<std_msgs::Float32>m0s("mt0",&m0cb);
 ros::Subscriber<std_msgs::Float32>m1s("mt1",&m1cb);
 ros::Subscriber<std_msgs::Float32>m2s("mt2",&m2cb); 
 ros::Subscriber<std_msgs::Float32>m3s("mt3",&m3cb);
 ros::Subscriber<std_msgs::Empty>reset("reset",&resetCb);
+ros::Subscriber<std_msgs::Int32>inm_sub("try",&Actuator);
 
 
 //msg
@@ -58,13 +63,12 @@ ros::Publisher pub1("enc1", &enc1Mg);
 ros::Publisher pub2("enc2", &enc2Mg);
 ros::Publisher pub3("enc3", &enc3Mg);
 
-int gnd[4]={27,39,33,32};
-int v[4]={31,41,25,24};
 
 
 void setup(){   
 	
-    
+    pinMode(inm.Airball, OUTPUT);
+    pinMode(inm.Airrale, OUTPUT);    
 	nh.initNode();
     nh.advertise(pub0);
     nh.advertise(pub1);
@@ -76,20 +80,14 @@ void setup(){
 	nh.subscribe(m2s);
 	nh.subscribe(m3s);
 	nh.subscribe(reset);
+	nh.subscribe(inm_sub);
 
-	for(int i=0;i<4;i++){
-		pinMode(v[i],OUTPUT);
-		digitalWrite(v[i],HIGH);
-		pinMode(gnd[i],OUTPUT);
-		digitalWrite(gnd[i],LOW);
-	}
-
-
+}
  //Encoder::M1oldencB=digitalRead(Encoder::b[0]);
  //Encoder::M2oldencB=digitalRead(Encoder::b[1]);
  //Encoder::M3oldencB=digitalRead(Encoder::b[2]);
     
-}
+
 
 void loop()
 {

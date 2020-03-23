@@ -19,6 +19,7 @@ from geometry_msgs.msg import Twist
 sys.path.append(str(Path('__file__').resolve().parent.parent))
 data_raw='../Route/'
 
+
 class File_Reader:
     def __init__(self):
        
@@ -94,8 +95,6 @@ class File_Reader:
         return True
         
     def route1(self,num):
-
-        pose=PoseStamped()
 
         waypoints=self.reading0(num)
         stoppoint=self.reading1(num)

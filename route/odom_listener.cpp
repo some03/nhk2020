@@ -19,6 +19,8 @@ class Odom_listener{
         bool sw=false;
         int count=-1;
         int n=-1;
+        std::string num;
+        //int num;
         nav_msgs::Odometry odom;
         std::vector<geometry_msgs::Pose>waypoint;
         geometry_msgs::PoseStamped finish_pose_;
@@ -27,7 +29,7 @@ class Odom_listener{
         std::string world_frame_;
 };
 
-Odom_listener::Odom_listener():filename_("waypoints0.yaml"){
+Odom_listener::Odom_listener():filename_("waypoints1.yaml"){
     
     start=0;
     pre_pose.position.x=0.0;
@@ -37,6 +39,8 @@ Odom_listener::Odom_listener():filename_("waypoints0.yaml"){
     pre_pose.orientation.y=0.0;
     pre_pose.orientation.z=0.0;
     pre_pose.orientation.w=0.0;
+
+    nh.param<std::string>("num",num,"1");
 }
 void Odom_listener::swCb(const std_msgs::Bool::ConstPtr& Msg){
     sw=Msg->data;
@@ -44,7 +48,7 @@ void Odom_listener::swCb(const std_msgs::Bool::ConstPtr& Msg){
 
 void Odom_listener::odomCb(const nav_msgs::Odometry &msg){
     
-    double  distance=pow(msg.pose.pose.position.x-pre_pose.position.x,2.0)+pow(msg.pose.pose.position.y-pre_pose.position.y,2.0)+pow(msg.pose.pose.position.z-pre_pose.position.z,2.0);
+    double  distance=std::hypot(msg.pose.pose.position.x,msg.pose.pose.position.y)-std::hypot(pre_pose.position.x,pre_pose.position.y);
     
     if(distance>=0.5){
         if(start==0)start=1;
@@ -82,14 +86,15 @@ void Odom_listener::odomCb(const nav_msgs::Odometry &msg){
 
 
 void Odom_listener::save(){
+    //str=std::to_string(num);
     //-----------waypoints.yamlにかきだし----------------//
-    std::ofstream ofs("waypoints0.yaml");
-    std::ofstream ofs2("switch0.yaml");
+    std::ofstream ofs("waypoints"+num+".yaml");
+    //std::ofstream ofs2("switch1.yaml");
     ofs<<"waypoints:"<<std::endl;
     
     for(int i=0;i<waypoint.size();i++){
        ofs<<"  "<<"- position:"<<std::endl;        
-       ofs<<"      x: "<<waypoint[i].position.x*0.5<<std::endl;
+       ofs<<"      x: "<<waypoint[i].position.x<<std::endl;
        ofs<<"      y: "<<waypoint[i].position.y<<std::endl;
        ofs<<"      z: "<<waypoint[i].position.z<<std::endl;
        ofs<<"      qx: "<<waypoint[i].orientation.x<<std::endl;
@@ -100,7 +105,7 @@ void Odom_listener::save(){
 
     }
 
-    ofs2<<"- "<<n<<std::endl;
+    //ofs2<<"- "<<n<<std::endl;
     
     ofs<<"finish_pose:"<<std::endl;
     ofs<<"  header: "<<std::endl;
@@ -117,7 +122,7 @@ void Odom_listener::save(){
     ofs<<"      y: "<<finish_pose_.pose.orientation.y<<std::endl;
     ofs<<"      z: "<<finish_pose_.pose.orientation.z<<std::endl;
     ofs<<"      w: "<<finish_pose_.pose.orientation.w<<std::endl;
-    ofs2.close();
+    //ofs2.close();
     ofs.close();
     std::cout<<"write success"<<std::endl;
         

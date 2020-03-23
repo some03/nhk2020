@@ -1,0 +1,5 @@
+<launch>
+ <node pkg="nhk_2020" type="odom_listener" name="odom_listener" output="screen">
+ <param name="num" value="2"/>   
+ </node>
+</launch>

@@ -1,7 +1,0 @@
-<launch> <node pkg="nhk_2020" type="Omni" name="Omni" output="screen"> </node>
-     <node pkg="nhk_2020" type="odometry_publisher" name="publisher" output="screen">
-     </node>
-
-    <include file ="$(find nhk_2020)/launch/arduino.launch"/>
-    <include file ="$(find nhk_2020)/launch/imu.launch"/>
-</launch>
