@@ -3,6 +3,18 @@
     </node>
     <node pkg="nhk_2020" type="Omni" name="Omni" output="screen">
     </node>
-    <node pkg="nhk_2020" type="laser_scan_publisher" name="laser_scan_publisher" output="screen">
-  	</node>
+    <arg name="limit" default="170"/>
+    <rosparam param="limit" subst_value="True">$(arg limit)</rosparam>
+<!--**************speed adjustment***********************-->
+    <arg name="ad0" default="1"/>
+    <rosparam param="ad0" subst_value="True">$(arg ad0)</rosparam>
+
+    <arg name="ad1" default="1"/>
+    <rosparam param="ad1" subst_value="True">$(arg ad1)</rosparam>
+
+    <arg name="ad2 default="2"/>
+    <rosparam param="ad2" subst_value="True">$(arg ad2)</rosparam>
+
+    <arg name="ad3" default="1"/>
+    <rosparam param="ad3" subst_value="True">$(arg ad3)</rosparam>
  </launch> 

@@ -1,7 +1,7 @@
 <launch>
 <!--arduino due-->
   <node pkg="rosserial_python" type="serial_node.py" name="test">
-   	<param name="port" value="/dev/ttyACM2"/>
+   	<param name="port" value="/dev/ttyACM0"/>
  </node>
 
 </launch>

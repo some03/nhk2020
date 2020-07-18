@@ -1,102 +1,115 @@
 #include<ros/ros.h>
-#include<bits/stdc++.h>
 #include<geometry_msgs/Twist.h>
 #include<std_msgs/Int32.h>
 #include<std_msgs/Float32.h>
-#include<tf2/LinearMath/Quaternion.h>
-#include<tf2/LinearMath/Matrix3x3.h>
+#include<std_msgs/Float64.h>
 #include<sensor_msgs/Imu.h>
-#define PI  3.14159265359 
-#define GR  1.63636363636
-#define PULSE 7100.0
-#define R 50.0
-#define l 70
+#include<math.h>
+#include<tf/transform_datatypes.h>
+#define R 50
+#define L 30
 
 class Omni{
-		private:
-			ros::NodeHandle nh;
-			ros::Publisher mt[4]={
-				nh.advertise<std_msgs::Float32>("mt0",1),
-				nh.advertise<std_msgs::Float32>("mt1",1),
-				nh.advertise<std_msgs::Float32>("mt2",1),
-				nh.advertise<std_msgs::Float32>("mt3",1)
-			};
-
-			void cmdcb(const geometry_msgs::Twist::ConstPtr& mg);
-			ros::Subscriber cmdsub=nh.subscribe("cmd_vel",10,&Omni::cmdcb,this);
-
-            void imuCb(const sensor_msgs::Imu& msg);
-            ros::Subscriber imu_sub=nh.subscribe("imu/data",10,&Omni::imuCb,this); 
-			
-            void mtgo(int num,float speed);
-			float r=0.05;
-			float limit=110;
-            int th=0;
-
-            double qx,qy,qz,qw;
-            double roll,pitch,yaw;
+    public:
+        Omni();
+	private:
+	    ros::NodeHandle nh;
+	    ros::Publisher mt[4]={
+		    nh.advertise<std_msgs::Float64>("mt0",1),//mt0
+		    nh.advertise<std_msgs::Float64>("mt1",1),//mt1
+		    nh.advertise<std_msgs::Float64>("mt2",1),//mt2
+		    nh.advertise<std_msgs::Float64>("mt3",1)//mt3
+	    };
+	void cmdcb(const geometry_msgs::Twist::ConstPtr& mg);
+	ros::Subscriber cmdsub=nh.subscribe("cmd_vel",10,&Omni::cmdcb,this);
+    void imuCb(const sensor_msgs::Imu& msg);
+    ros::Subscriber imu_sub=nh.subscribe("imu/data",10,&Omni::imuCb,this); 
+    
+    void mtgo(int num,float speed);
+    
+    float limit=170,ad[4];
+    double roll,pitch,yaw;
+    double qx,qy,qz,qw;
 };
 
-void Omni::imuCb(const sensor_msgs::Imu&  msg){
-        
-        qx=msg.orientation.x;
-        qy=msg.orientation.y;
-        qz=msg.orientation.z;
-        qw=msg.orientation.w;
-
-        
-        tf2::Quaternion quat(qx,qy,qz,qw);
-        tf2::Matrix3x3(quat).getRPY(roll,pitch,yaw);
-}       
-
-void Omni::mtgo(int num ,float speed){
-		std_msgs::Float32 mg;
-		mg.data=speed;
-		mt[num].publish(mg);
+Omni::Omni(){
+    nh.param<float>("limit",limit,170);
+    
+    nh.param<float>("ad0",ad[0],1);
+    nh.param<float>("ad1",ad[1],1);
+    nh.param<float>("ad2",ad[2],1);
+    nh.param<float>("ad3",ad[3],1);
+    
 }
 
+void Omni::mtgo(int num ,float speed){
+    std_msgs::Float64 mg;
+	mg.data=speed;
+	mt[num].publish(mg);
+}
+
+void Omni::imuCb(const sensor_msgs::Imu&  msg){
+
+    qx=msg.orientation.x;
+    qy=msg.orientation.y;
+    qz=msg.orientation.z;
+    qw=msg.orientation.w;
+
+    tf::Quaternion quat(qx,qy,qz,qw);
+    tf::Matrix3x3(quat).getRPY(roll,pitch,yaw);
+    
+    }
+
 void Omni::cmdcb(const geometry_msgs::Twist::ConstPtr& mg){
-        //----translation speed vector3----------------
-		geometry_msgs::Vector3 linear=mg->linear;
-		//-----rotational speed vector3----------------
-		geometry_msgs::Vector3 angular=mg->angular;
-		float x=linear.x;
-		float y=linear.y;
-		float z=angular.z;
-        float  m[4];
-		
-        
-        m[0]=-sqrt(2)/2*x+sqrt(2)/2*y+r*z;
-		m[1]=sqrt(2)/2*x+sqrt(2)/2*y+r*z;
-		m[2]=sqrt(2)/2*x-sqrt(2)/2*y+r*z;
-		m[3]=-sqrt(2)/2*x-sqrt(2)/2*y+r*z;
-       /* 
-        th=0;
-
-        m[0]=-r*x*cos(th*PI/4)+r*y*sin(th*PI/4)+r*z;
-        m[1]=r*x*cos(th*PI*3/4)+r*y*sin(th*PI/4)+r*z;
-        m[2]=r*x*cos(th*PI*3/4)+r*y*sin(th*PI*3/4)+r*z;
-        m[3]=-r*x*cos(th*PI/4)+r*y*sin(th*PI*3/4)+r*z;
-
-        */
-		if(m[0]>=0)m[0]=std::min(m[0],limit);
-		else m[0]=std::max(m[0],-limit);
-		if(m[1]>=0)m[1]=std::min(m[1],limit);
-		else m[1]=std::max(m[1],-limit);
-		if(m[2]>=0)m[2]=std::min(m[2],limit);
-		else m[2]=std::max(m[2],-limit);
-		if(m[3]>=0)m[3]=std::min(m[3],limit);
-		else m[3]=std::max(m[3],-limit);
-
-
-		for(int i=0;i<4;i++)mtgo(i,m[i]);
+    //----translation speed vector3----------------
+	geometry_msgs::Vector3 linear=mg->linear;
+	//-----rotational speed vector3----------------
+	geometry_msgs::Vector3 angular=mg->angular;
+	float x=linear.x;
+	float y=linear.y;
+	float z=angular.z;
+    float  m[4];
+    float th=yaw;
+    int dt=10;
+    
+    m[0]=x*-cos(th+M_PI_4)+y*sin(th+M_PI_4)+L*z*ad[0];
+    m[1]=x*cos(th+M_PI_4)+y*sin(th+M_PI_4)+L*z*ad[1];
+    m[2]=x*cos(th+M_PI_4)+y*-sin(th+M_PI_4)+L*z*ad[2];
+    m[3]=x*-cos(th+M_PI_4)+y*-sin(th+M_PI_4)+L*z*ad[3];
+    
+/*
+    m[0]=-x*sin(M_PI_4)+y*cos(M_PI_4)+r*z;
+    m[1]=-x*sin(-M_PI_4)+y*cos(-M_PI_4)+r*z;
+    m[2]=x*sin(M_PI_4)-y*cos(M_PI_4)+r*z;
+    m[3]=x*sin(-M_PI_4)-y*cos(-M_PI_4)+r*z;
+    
+ */  
+    if(m[0]>=0)m[0]=std::min(m[0],limit);
+    else m[0]=std::max(m[0],-limit);
+    if(m[1]>=0)m[1]=std::min(m[1],limit);
+    else m[1]=std::max(m[1],-limit);
+    if(m[2]>=0)m[2]=std::min(m[2],limit);
+    else m[2]=std::max(m[2],-limit);
+    if(m[3]>=0)m[3]=std::min(m[3],limit);
+    else m[3]=std::max(m[3],-limit);
+    
+    for(int i=0;i<4;i++)mtgo(i,m[i]);
+    
+    ROS_INFO("m[0]%lf",m[0]);
+    ROS_INFO("m[1]%lf",m[1]);
+    ROS_INFO("m[2]%lf",m[2]);
+    ROS_INFO("m[3]%lf",m[3]);
 
 }
 int main(int argc,char**argv){
-		ros::init(argc,argv,"Omni");
-		Omni omni;
-		ros::spin();
-		return 0;
+    ros::init(argc,argv,"Omni");
+    Omni omni;
+    ros::Rate loop_rate(10);
+    while(ros::ok()){
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
+    return 0;
 }
 
 

@@ -4,9 +4,13 @@
  
 geometry_msgs::Twist mg;
 void Cb(const geometry_msgs::Twist& msg){
-        mg.linear.x=msg.linear.x;
-        mg.linear.y=msg.linear.y;
-        mg.angular.z=msg.angular.z;
+        double x=msg.linear.x;
+        double y=msg.linear.y;
+        double z=msg.angular.z;
+        mg.linear.x=x;
+        mg.linear.y=y;
+        mg.linear.z=z;
+        ROS_INFO("%lf",mg.linear.x);
      }
 int main(int argc, char** argv){
     ros::init(argc, argv, "ps3");
@@ -14,9 +18,12 @@ int main(int argc, char** argv){
     ros::NodeHandle nh;
 
     ros::Publisher ord_pub=nh.advertise<geometry_msgs::Twist>("cmd_vel",10); 
-
-    ord_pub.publish(mg);
     ros::Subscriber sub=nh.subscribe("ps3_cmd_vel",10,&Cb);  
     ros::Rate loop_rate(1.0);
-    ros::spin();
-   }
+    while(ros::ok()){
+       ord_pub.publish(mg); 
+       ros::spinOnce();
+       loop_rate.sleep();
+    }
+
+}
