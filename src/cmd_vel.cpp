@@ -38,7 +38,7 @@ Cmd::Cmd(){
     success=false;
     nh.param<double>("kp",kp,90); 
     nh.param<double>("td",td,0); 
-    nh.param<double>("cnt",cnt,447300); 
+    nh.param<int>("cnt",cnt,447300); 
 }
 void Cmd::goalCb(const geometry_msgs::PoseStamped& msg){
         

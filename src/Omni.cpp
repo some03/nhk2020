@@ -72,10 +72,10 @@ void Omni::cmdcb(const geometry_msgs::Twist::ConstPtr& mg){
     float th=yaw;
     int dt=10;
     
-    m[0]=x*-cos(th+M_PI_4)+y*sin(th+M_PI_4)+L*z*ad[0];
-    m[1]=x*cos(th+M_PI_4)+y*sin(th+M_PI_4)+L*z*ad[1];
-    m[2]=x*cos(th+M_PI_4)+y*-sin(th+M_PI_4)+L*z*ad[2];
-    m[3]=x*-cos(th+M_PI_4)+y*-sin(th+M_PI_4)+L*z*ad[3];
+    m[0]=(x*-cos(th+M_PI_4)+y*sin(th+M_PI_4)+L*z)*ad[0];
+    m[1]=(x*cos(th+M_PI_4)+y*sin(th+M_PI_4)+L*z)*ad[1];
+    m[2]=(x*cos(th+M_PI_4)+y*-sin(th+M_PI_4)+L*z)*ad[2];
+    m[3]=(x*-cos(th+M_PI_4)+y*-sin(th+M_PI_4)+L*z)*ad[3];
     
 /*
     m[0]=-x*sin(M_PI_4)+y*cos(M_PI_4)+r*z;

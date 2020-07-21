@@ -12,7 +12,7 @@
     <arg name="ad1" default="1"/>
     <rosparam param="ad1" subst_value="True">$(arg ad1)</rosparam>
 
-    <arg name="ad2 default="2"/>
+    <arg name="ad2" default="1"/>
     <rosparam param="ad2" subst_value="True">$(arg ad2)</rosparam>
 
     <arg name="ad3" default="1"/>
