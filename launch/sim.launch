@@ -1,8 +1,12 @@
 <launch>
-    <node pkg="nhk_2020" type="Omni" name="Omni" output="screen">
-    </node>
     <node pkg="nhk_2020" type="pub_cmd" name="pub_cmd" output="screen">
     </node>
     <arg name="kp" default="90"/>
     <rosparam param="kp" subst_value="True">$(arg kp)</rosparam>
+
+    <arg name="cnt" default="1"/>
+    <rosparam param="cnt" subst_value="True">$(arg cnt)</rosparam>
+
+    <arg name="td" default="0"/>
+    <rosparam param="td" subst_value="True">$(arg td)</rosparam>
 </launch>

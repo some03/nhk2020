@@ -129,7 +129,7 @@ double Odom::Caluc(long theta,double L){
 geometry_msgs::Twist Odom::Odom_Invert(double *v,int yaw){
     geometry_msgs::Twist odom;
 
-    for(int n=0;n<4;n++)vx=data[0][n]*v[n],vy=data[1][n]*v[n],vz=data[2][n];
+    for(int n=0;n<4;n++)vx+=data[0][n]*v[n],vy+=data[1][n]*v[n],vz+=data[2][n];
     
     odom.linear.x=vx;
     odom.linear.y=vy;

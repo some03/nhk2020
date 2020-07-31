@@ -69,7 +69,7 @@ void publish(){
 
 int main(int argc,char**argv){
     ros::init(argc,argv,"odometry_publisher");
-    ros::Rate loop_rate(5);
+    ros::Rate loop_rate(10);
 //---------------------------------------------------------------------------//    
     ros::Subscriber odom0=nh.subscribe("enc0",10,m0Cb);
     ros::Subscriber odom1=nh.subscribe("enc1",10,m1Cb);
