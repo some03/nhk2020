@@ -1,6 +1,5 @@
 # Branch  
 Metric :メイン  
-master:
 # メモ
 ad1=0.98,ad3=1.05(シミュレータ上)
 
