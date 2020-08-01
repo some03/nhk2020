@@ -72,8 +72,8 @@ void Cmd::calc(){
 
     geometry_msgs::Twist mg;
     
-    if(!flag)time=0;
-    else time+=0.5;
+    if(flag)time=0;
+    time+=0.5;
     
     target_speed_x=(x/cnt)/target_time;
     target_speed_y=(y/cnt)/target_time;
@@ -81,6 +81,20 @@ void Cmd::calc(){
 
     
     //2.5m/s  time=目標時間-経過時間
+    if(target_time-time<=0.5){
+        mg.linear.x=0;
+        mg.linear.y=0;
+        mg.linear.z=0;
+
+        ord_pub.publish(mg);
+        flag=false;
+        while(!flag){
+            ;
+            
+        }
+        
+        
+    }
 
 
     now_speed_x=((x-now_position_x)/cnt)/(target_time-time);  
@@ -109,8 +123,8 @@ void Cmd::calc(){
 }
 
 int main(int argc,char**argv){
-		ros::init(argc,argv,"pub_cmd");
-		Cmd cmd;
+        ros::init(argc,argv,"pub_cmd");
+        Cmd cmd;
         ros::Rate loop_rate(2);
         while(ros::ok()){
             cmd.calc();
