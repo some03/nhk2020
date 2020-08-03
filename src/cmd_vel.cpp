@@ -95,7 +95,7 @@ void Cmd::calc(){
         
         
     }
-
+//
 
     now_speed_x=((x-now_position_x)/cnt)/(target_time-time);  
     now_speed_y=((y-now_position_y)/cnt)/(target_time-time);
