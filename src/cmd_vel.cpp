@@ -5,6 +5,7 @@
 #include<std_msgs/Float64.h>
 #include<nav_msgs/Odometry.h>
 #include<std_msgs/Bool.h>
+#include<temp.h>
 class Cmd{
     public:
         Cmd();
@@ -55,7 +56,8 @@ void Cmd::goalCb(const geometry_msgs::PoseStamped& msg){
     x=msg.pose.position.x;
     y=msg.pose.position.y;
     z=msg.pose.position.z;
-
+    
+    flag=true;
     
     ROS_INFO("x:%lf",x);
     ROS_INFO("y:%lf",y);
@@ -101,9 +103,15 @@ void Cmd::calc(){
     now_speed_y=((y-now_position_y)/cnt)/(target_time-time);
     now_speed_z=((z-now_position_z)/cnt)/(target_time-time);
 
-    mg.linear.x=target_speed_x+kp*(target_speed_x-now_speed_x);
-    mg.linear.y=target_speed_y+kp*(target_speed_y-now_speed_y);
-    mg.linear.z=target_speed_z+kp*(target_speed_z-now_speed_z);
+    double speed_x=target_speed_x+kp*(target_speed_x-now_speed_x);
+    double speed_y=target_speed_y+kp*(target_speed_y-now_speed_y);
+    double speed_z=target_speed_z+kp*(target_speed_z-now_speed_z);
+
+    Duty<double>duty;
+    duty.ret(speed_x,speed_y,speed_z,1);
+    mg.linear.x=duty.x;
+    mg.linear.y=duty.y;
+    mg.angular.z=duty.z;
 
 /*
     px=kp*((x-nowx)/cnt+td*(oldx/0.01));
