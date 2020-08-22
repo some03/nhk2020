@@ -24,13 +24,13 @@ class Cmd{
         ros::Publisher result=nh.advertise<std_msgs::Bool>("result",10); 
         
     
-        double x,px;
-        double y,py;
-        double z,pz;
-        double now_speed_x,target_speed_x,now_position_x;
-        double now_speed_y,target_speed_y,now_position_y;
-        double now_speed_z,target_speed_z,now_position_z;
-        double kp,td;
+        double x,xi;
+        double y,yi;
+        double z,zi;
+        double now_speed_x,now_position_x;
+        double now_speed_y,now_position_y;
+        double now_speed_z,now_position_z;
+        double kp,ki;
         double time,target_time;
         int cnt;
         
@@ -40,12 +40,12 @@ Cmd::Cmd(){
     x=0;
     y=0;     
     z=0;     
-    now_speed_x=0,target_speed_x=0,now_position_x=0;
-    now_speed_y=0,target_speed_y=0,now_position_y=0;
-    now_speed_z=0,target_speed_z=0,now_position_z=0;
+    now_speed_x=0,now_position_x=0;
+    now_speed_y=0,now_position_y=0;
+    now_speed_z=0,now_position_z=0;
     
-    nh.param<double>("kp",kp,90); 
-    nh.param<double>("td",td,0); 
+    nh.param<double>("kp",kp,1.5); 
+    nh.param<double>("ki",ki,0); 
     nh.param<double>("target_time",target_time,4); 
     nh.param<int>("cnt",cnt,1);//447300); 
 
@@ -73,59 +73,30 @@ void Cmd::stateCb(const nav_msgs::Odometry& msg){
 void Cmd::calc(){
 
     geometry_msgs::Twist mg;
-    
-    if(flag)time=0;
-    time+=0.5;
-    
-    target_speed_x=(x/cnt)/target_time;
-    target_speed_y=(y/cnt)/target_time;
-    target_speed_z=(z/cnt)/target_time;
 
-    
-    //2.5m/s  time=目標時間-経過時間
-    if(target_time-time<=0.5){
-        mg.linear.x=0;
-        mg.linear.y=0;
-        mg.linear.z=0;
+    double error_x=((x-now_position_x)/cnt);  
+    double error_y=((y-now_position_y)/cnt);
+    double error_z=((z-now_position_z)/cnt);
 
-        ord_pub.publish(mg);
-        flag=false;
-        while(!flag){
-            ;
-            
-        }
-        
-        
-    }
-//
 
-    now_speed_x=((x-now_position_x)/cnt)/(target_time-time);  
-    now_speed_y=((y-now_position_y)/cnt)/(target_time-time);
-    now_speed_z=((z-now_position_z)/cnt)/(target_time-time);
+    xi+=ki*0.5*error_x;
+    yi+=ki*0.5*error_y;
+    zi+=ki*0.5*error_z;
 
-    double speed_x=target_speed_x+kp*(target_speed_x-now_speed_x);
-    double speed_y=target_speed_y+kp*(target_speed_y-now_speed_y);
-    double speed_z=target_speed_z+kp*(target_speed_z-now_speed_z);
+    double mv_x=kp*(error_x)+xi;
+    double mv_y=kp*(error_y)+yi;
+    double mv_z=kp*(error_z)+zi;
 
     Duty<double>duty;
-    duty.ret(speed_x,speed_y,speed_z,1);
+    duty.ret(mv_x,mv_y,mv_z,1.0);
+
     mg.linear.x=duty.x;
     mg.linear.y=duty.y;
     mg.angular.z=duty.z;
-
-/*
-    px=kp*((x-nowx)/cnt+td*(oldx/0.01));
-    py=kp*((y-nowy)/cnt+td*(oldy/0.01));
-    pz=kp*((z-nowz)/cnt+td*(oldz/0.01));
-   
-    oldx=(x-nowx);
-    oldy=(x-nowy);
-    oldz=(x-nowz);
-*/
     ord_pub.publish(mg);
     
-    ROS_INFO("now_speed_x:%lf",now_speed_x);
-    ROS_INFO("now_speed_y:%lf",now_speed_y);
+    ROS_INFO("now_speed_x:%lf",mv_x);
+    ROS_INFO("now_speed_y:%lf",mv_y);
     ROS_INFO("tx:%lf",mg.linear.x);
     ROS_INFO("ty:%lf",mg.linear.y);
 }
