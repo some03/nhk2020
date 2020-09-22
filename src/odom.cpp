@@ -4,7 +4,7 @@
 #include<nav_msgs/Odometry.h>
 #include<sensor_msgs/Imu.h>
 #include<tf/transform_broadcaster.h>
-#include<matrix.h>
+#include<Odometry_compute.h>
 #include<std_msgs/Int32.h>
 #define R 50
 #define L 30
@@ -12,7 +12,8 @@
 double enc[4];
 
 double roll,pitch,yaw;
-Odom odom;
+
+OdomCompute odc("THREE",R);
 ros::NodeHandle nh;
 
 void m0Cb(const std_msgs::Int32::ConstPtr& msg){
@@ -40,27 +41,23 @@ void imuCb(const sensor_msgs::Imu&  msg){
 //-----geometry_msgs::Quaternion-->tf2::Quaternion-----------//
         tf::Quaternion quat(Q.x,Q.y,Q.z,Q.w);
         tf::Matrix3x3(quat).getRPY(roll,pitch,yaw);
-        
-        odom.Caluc(yaw,L);
 //----------------------------------------------------------//
     }
 
 
 void publish(){
 
+
     ros::Publisher odom_pub=nh.advertise<nav_msgs::Odometry>("odom",10);
 //-------------------------------------------------// 
     ros::Time current_time=ros::Time::now();
     geometry_msgs::Pose position;
-    geometry_msgs::Twist speed;
     nav_msgs::Odometry odom_msg;
 //-------------------------------------------------//
-    speed=odom.Odom_Invert(enc,yaw);
-    position=odom.Updata_Pose(speed);
+    position=odc.Updata_Pose(enc,yaw,1800);
 //-------------------------------------------------//
     odom_msg.header.stamp=current_time;
     odom_msg.header.frame_id="odom";
-    odom_msg.twist.twist=speed;
     odom_msg.pose.pose=position;
     odom_pub.publish(odom_msg);
    
