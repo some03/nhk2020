@@ -1,11 +1,11 @@
 #include<ros/ros.h>
 #include<geometry_msgs/Twist.h>
 #include<geometry_msgs/PoseStamped.h>
-#include<geometry_msgs/Pose2D.h>
 #include<std_msgs/Float64.h>
 #include<nav_msgs/Odometry.h>
 #include<std_msgs/Bool.h>
-#include<temp.h>
+#include<CubicSpline.h>
+#include<my_msg/Position.h>
 class Cmd{
     public:
         Cmd();
@@ -14,7 +14,7 @@ class Cmd{
     private:
         ros::NodeHandle nh;
 
-        void goalCb(const geometry_msgs::PoseStamped&  msg);
+        void goalCb(const my_msg::Position&  msg);
         ros::Subscriber goal_sub=nh.subscribe("goal",10,&Cmd::goalCb,this);
 
         void stateCb(const nav_msgs::Odometry&  msg);
@@ -24,44 +24,45 @@ class Cmd{
         ros::Publisher result=nh.advertise<std_msgs::Bool>("result",10); 
         
     
-        double x,xi;
-        double y,yi;
-        double z,zi;
-        double now_speed_x,now_position_x;
-        double now_speed_y,now_position_y;
-        double now_speed_z,now_position_z;
+        double now_position_x;
+        double now_position_y;
+        double now_position_z;
         double kp,ki;
         double time,target_time;
-        int cnt;
+        double endpoint;
+        double point,i;
+        
+        double goalz;
+        std::vector<double>goalx;
+        std::vector<double>goaly;
+
+        CubicSpline csx;
+        CubicSpline csy;
+        
         
 
 };
 Cmd::Cmd(){
-    x=0;
-    y=0;     
-    z=0;     
-    now_speed_x=0,now_position_x=0;
-    now_speed_y=0,now_position_y=0;
-    now_speed_z=0,now_position_z=0;
     
-    nh.param<double>("kp",kp,1.5); 
-    nh.param<double>("ki",ki,0); 
-    nh.param<double>("target_time",target_time,4); 
-    nh.param<int>("cnt",cnt,1);//447300); 
+    now_position_x=0;
+    now_position_y=0;
+    now_position_z=0;
+    point=0.0; 
 
 
 }
-void Cmd::goalCb(const geometry_msgs::PoseStamped& msg){
+void Cmd::goalCb(const my_msg::Position& msg){
+   
+    int len=msg.x.size();
+    for(int i=0;i<len;i++){
+        goalx.push_back(msg.x[i]);
+        goaly.push_back(msg.y[i]);
+        goalz=msg.z;
+    }
     
-    x=msg.pose.position.x;
-    y=msg.pose.position.y;
-    z=msg.pose.position.z;
-    
-    flag=true;
-    
-    ROS_INFO("x:%lf",x);
-    ROS_INFO("y:%lf",y);
-    ROS_INFO("z:%lf",z);
+    csx.InitParameter(goalx);
+    csy.InitParameter(goaly);
+    i=0;
 
 }
 void Cmd::stateCb(const nav_msgs::Odometry& msg){
@@ -73,38 +74,40 @@ void Cmd::stateCb(const nav_msgs::Odometry& msg){
 void Cmd::calc(){
 
     geometry_msgs::Twist mg;
+    
+    double error_x=abs(goalx[i]-now_position_x);  
+    double error_y=abs(goaly[i]-now_position_y);
+    double error_z=(goalz-now_position_z);
+    
+    double scale_x=1-(1.0/error_x)*10;
+    double scale_y=1-(1.0/error_y)*10;
 
-    double error_x=((x-now_position_x)/cnt);  
-    double error_y=((y-now_position_y)/cnt);
-    double error_z=((z-now_position_z)/cnt);
+    double parameter=((scale_x+scale_y)/2);
+    
+    floor(parameter);
+    
+    parameter/=10;
 
+    if(parameter>=0.9)i++,point++;
 
-    xi+=ki*0.5*error_x;
-    yi+=ki*0.5*error_y;
-    zi+=ki*0.5*error_z;
+    parameter+=point;
 
-    double mv_x=kp*(error_x)+xi;
-    double mv_y=kp*(error_y)+yi;
-    double mv_z=kp*(error_z)+zi;
+    csx.Calc(parameter);
+    csy.Calc(parameter);
 
-    Duty<double>duty;
-    duty.ret(mv_x,mv_y,mv_z,1.0);
+    
 
-    mg.linear.x=duty.x;
-    mg.linear.y=duty.y;
-    mg.angular.z=duty.z;
+    mg.linear.x=csx.accl;
+    mg.linear.y=csy.accl;
+    mg.angular.z=goalz;
     ord_pub.publish(mg);
     
-    ROS_INFO("now_speed_x:%lf",mv_x);
-    ROS_INFO("now_speed_y:%lf",mv_y);
-    ROS_INFO("tx:%lf",mg.linear.x);
-    ROS_INFO("ty:%lf",mg.linear.y);
 }
 
 int main(int argc,char**argv){
         ros::init(argc,argv,"pub_cmd");
         Cmd cmd;
-        ros::Rate loop_rate(2);
+        ros::Rate loop_rate(10);
         while(ros::ok()){
             cmd.calc();
             ros::spinOnce();

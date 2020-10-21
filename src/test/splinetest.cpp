@@ -1,6 +1,6 @@
 #include<vector>
-#include<../include/CubicSpline.h>
-#include<../include/matplotlib-cpp-starter/matplotlibcpp.h>
+#include<../../include/CubicSpline.h>
+#include<../../include/matplotlib-cpp-starter/matplotlibcpp.h>
 
 namespace plt=matplotlibcpp;
 
@@ -15,10 +15,11 @@ int main(){
     std::vector<double>rx;
     std::vector<double>ry;
 
-    for(double i=0.0;i<=10;i+=0.1){
+    for(double i=0.0;i<=6;i+=0.1){
         ry.push_back(csy.Calc(i));
+        cout<<"y:"<<" "<<csy.Calc(i)<<endl;
         rx.push_back(csx.Calc(i));
-        cout<<rx[i]<<endl;
+        cout<<"x"<<" "<<csx.Calc(i)<<endl;;
     }
     
     plt::named_plot("TRUES",sx,sy,"xb");
@@ -27,4 +28,5 @@ int main(){
     plt::axis("equal");
     plt::grid(true);
     plt::show();
+    
 }

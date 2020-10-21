@@ -1,14 +1,13 @@
 //#define USE_USBCON
 #include <ros.h>
 #include<geometry_msgs/Twist.h>
-//#include <sensor_msgs/Imu.h>
+#include <sensor_msgs/Imu.h>
 #include <std_msgs/Int32.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Float32.h>
 #include <Arduino.h>
 #include <Encoder.h>
 #include <Bmx055.h>
-#include<MadgwickAHRS.h>
 #include<std_msgs/Empty.h>
 
 ros::NodeHandle nh;
@@ -20,7 +19,7 @@ std_msgs::Int32 enc1Mg;
 std_msgs::Int32 enc2Mg;
 std_msgs::Int32 enc3Mg;
 
-//sensor_msgs::Imu imuMg;
+sensor_msgs::Imu imuMg;
 
 
 //publisher
@@ -30,7 +29,7 @@ ros::Publisher pub1("enc1", &enc1Mg);
 ros::Publisher pub2("enc2", &enc2Mg);
 ros::Publisher pub3("enc3", &enc3Mg);
 
-//ros::Publisher imuPb("imu/data_raw",&imuMg);
+ros::Publisher imuPb("imu/data_raw",&imuMg);
 
 void resetCb(const std_msgs::Empty &mg){
 		Encoder::set();
@@ -45,7 +44,7 @@ void setup(){
     nh.advertise(pub1);
     nh.advertise(pub2);
 	nh.advertise(pub3);
-    //nh.advertise(imuPb);
+    nh.advertise(imuPb);
     nh.subscribe(reset);
 
     Wire.begin();
@@ -72,7 +71,7 @@ void loop()
     
     BMX055_Accl();
     BMX055_Gyro();
-/*
+
     imuMg.header.stamp=nh.now();
     imuMg.header.frame_id="imu_link";
     imuMg.linear_acceleration.x=xAccl;
@@ -85,7 +84,7 @@ void loop()
 
 
     imuPb.publish(&imuMg);
-    */
+    
     
     nh.spinOnce();
     delay(1);

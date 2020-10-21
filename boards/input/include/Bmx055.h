@@ -107,9 +107,9 @@ void BMX055_Accl()
   if (yAccl > 2047)  yAccl -= 4096;
   zAccl = ((data[5] * 256) + (data[4] & 0xF0)) / 16;
   if (zAccl > 2047)  zAccl -= 4096;
-  xAccl = xAccl * 0.0098;//*0.102; // renge +-2g
-  yAccl = yAccl * 0.0098;//*0.102; // renge +-2g
-  zAccl = zAccl * 0.0098;//*0.102; // renge +-2g
+  xAccl = xAccl * 0.0098*0.102; // renge +-2g
+  yAccl = yAccl * 0.0098*0.102; // renge +-2g
+  zAccl = zAccl * 0.0098*0.102; // renge +-2g
 }
 //=====================================================================================//
 void BMX055_Gyro()
@@ -134,9 +134,9 @@ void BMX055_Gyro()
   zGyro = (data[5] * 256) + data[4];
   if (zGyro > 32767)  zGyro -= 65536;
 
-  xGyro = xGyro * 0.0038;//*(M_PI/180); //  Full scale = +/- 125 degree/s
-  yGyro = yGyro * 0.0038;//*(M_PI/180); //  Full scale = +/- 125 degree/s
-  zGyro = zGyro * 0.0038;//*(M_PI/180); //  Full scale = +/- 125 degree/s
+  xGyro = xGyro * 0.0038*(M_PI/180); //  Full scale = +/- 125 degree/s
+  yGyro = yGyro * 0.0038*(M_PI/180); //  Full scale = +/- 125 degree/s
+  zGyro = zGyro * 0.0038*(M_PI/180); //  Full scale = +/- 125 degree/s
 }
 //=====================================================================================//
 void BMX055_Mag()

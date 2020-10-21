@@ -37,7 +37,7 @@ bool Btd::getButtonPress(std::string name){
     if(name=="CROSS") rep=this->Check(c[2],0x20);
     else if(name=="CIRCLE") rep=this->Check(c[2],0x40);
     else if(name=="TRIANGLE") rep=this->Check(c[2],0x10);
-    else if(name=="SQUARE") rep=this->Check(c[2],0x01);
+    else if(name=="SQUARE") rep=this->Check(c[1],0x01);
     else rep=false; 
     return rep;
 }

@@ -19,9 +19,8 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   tf2
   tf2_ros
-  nav_msgs
-  move_base_msgs
   tf
+  my_msg
 )
 
 ## System dependencies are found with CMake's conventions
@@ -224,8 +223,6 @@ add_executable(Omni src/Omni.cpp)
 target_link_libraries(Omni ${catkin_LIBRARIES})
 
 
-add_executable(Test_Run  src/test.cpp)
-target_link_libraries(Test_Run ${catkin_LIBRARIES})
 
 
 add_executable(odometry_publisher  src/odom.cpp)
@@ -237,8 +234,10 @@ target_link_libraries(odom_listener ${catkin_LIBRARIES})
 
 
 add_executable(pub_cmd  src/cmd_vel.cpp)
+add_dependencies(pub_cmd ${${PROJECT_NAME}_EXPORTED_TARGETS}${catkin_EXPORTED_TARGETS})
 target_link_libraries(pub_cmd ${catkin_LIBRARIES})
 
 
 add_executable(ps3  src/ps3.cpp)
 target_link_libraries(ps3 ${catkin_LIBRARIES})
+
