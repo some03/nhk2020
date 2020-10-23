@@ -5,8 +5,8 @@
 namespace plt=matplotlibcpp;
 
 int main(){
-    std::vector<double>sx{-5,-5,-3,2,3,0,-2};
-    std::vector<double>sy{6,1,6,7,1,-1,0};
+    std::vector<double>sy{3,1,0,0};
+    std::vector<double>sx{0,0,0,0};
 
 
     CubicSpline csy(sy);
@@ -15,11 +15,13 @@ int main(){
     std::vector<double>rx;
     std::vector<double>ry;
 
-    for(double i=0.0;i<=6;i+=0.1){
-        ry.push_back(csy.Calc(i));
-        cout<<"y:"<<" "<<csy.Calc(i)<<endl;
-        rx.push_back(csx.Calc(i));
-        cout<<"x"<<" "<<csx.Calc(i)<<endl;;
+    for(double i=0.0;i<=4;i+=0.2){
+        csy.Calc(i);
+        ry.push_back(csy.accl);
+        cout<<"y:"<<" "<<csy.accl<<endl;
+        csx.Calc(i);
+        rx.push_back(csx.accl);
+        cout<<"x"<<" "<<csx.accl<<endl;;
     }
     
     plt::named_plot("TRUES",sx,sy,"xb");

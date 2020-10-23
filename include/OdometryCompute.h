@@ -25,18 +25,19 @@ geometry_msgs::Pose OdomCompute::Updata_Pose(double *cnt,double yaw,int pl){
     double radius=2*M_PI*R;
 
     if(num=="THREE"){
-                /* 1-->
+                /* --1
                  *  |
-                *2<-- 3<--*/
+                   / \
+                *2-- 3--*/
 
         for(int i=0;i<3;i++){
             cnt[i]/=pl;
             cnt[i]*=radius;
         }
-        x=cnt[0]*sin(M_PI/2)-cnt[1]*cos(M_PI/3)-cnt[2]*cos(M_PI/2); 
-        y=cnt[0]*cos(M_PI/2)+cnt[1]*sin(M_PI/3)-cnt[2]*sin(M_PI/2); 
-        x=x*cos(yaw)-y*sin(yaw);
-        y=x*sin(yaw)+y*cos(yaw);
+        x=-cnt[0]*sin(M_PI/2)+cnt[1]*cos(M_PI/3)+cnt[2]*cos(M_PI/2); 
+        y=cnt[0]*cos(M_PI/2)-cnt[1]*sin(M_PI/3)+cnt[2]*sin(M_PI/2); 
+        x=x*cos(yaw)+y*sin(yaw);
+        y=x*-sin(yaw)+y*cos(yaw);
         z=yaw; 
 
     }

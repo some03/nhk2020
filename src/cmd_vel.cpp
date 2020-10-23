@@ -79,8 +79,8 @@ void Cmd::calc(){
     double error_y=abs(goaly[i]-now_position_y);
     double error_z=(goalz-now_position_z);
     
-    double scale_x=1-(1.0/error_x)*10;
-    double scale_y=1-(1.0/error_y)*10;
+    double scale_x=1-(error_x*(1.0/error_x))*10;
+    double scale_y=1-(error_y*(1.0/error_y))*10;
 
     double parameter=((scale_x+scale_y)/2);
     

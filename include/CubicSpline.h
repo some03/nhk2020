@@ -6,10 +6,10 @@
 using namespace std;
 class CubicSpline{
     public:
-        //CubicSpline(const vector<double> y);
+        CubicSpline(const vector<double> y);
         double Calc(double t);
         double accl;
-        double CalcEndpoint(const vector<double> y);
+        //double CalcEndpoint(const vector<double> y);
         void InitParameter(const vector<double> y);
     private:
         vector<double>a_;
@@ -20,9 +20,9 @@ class CubicSpline{
 
 };
 
-/*CubicSpline::CubicSpline(const vector<double>y){
+CubicSpline::CubicSpline(const vector<double>y){
     InitParameter(y);
-}*/
+}
 void CubicSpline::InitParameter(const vector<double>y){
     int data=y.size()-1;
 
@@ -67,14 +67,15 @@ void CubicSpline::InitParameter(const vector<double>y){
         }
     }
 }
-double CubicSpline::CalcEndpoint(const vector<double> y){
+/*double CubicSpline::CalcEndpoint(const vector<double> y){
     int dt=y.size();   
-    /*
+    
     double dy=b_[j]+(c_[j]+d_[j]*dt)*dt;
     return dy*dy;
-    */
+    
     return 0;
 }
+*/
 
 double CubicSpline::Calc(double t){
     int j=int(floor(t));

@@ -6,8 +6,6 @@
 #include<sensor_msgs/Imu.h>
 #include<math.h>
 #include<tf/transform_datatypes.h>
-#define R 50
-#define L 30
 
 class Omni{
     public:
@@ -30,6 +28,7 @@ class Omni{
     float limit=170,ad[4];
     double roll,pitch,yaw;
     double qx,qy,qz,qw;
+    int dt=10;
 };
 
 Omni::Omni(){
@@ -68,43 +67,41 @@ void Omni::cmdcb(const geometry_msgs::Twist::ConstPtr& mg){
 	float x=linear.x;
 	float y=linear.y;
 	float z=angular.z;
-    float  m[4];
-    float th=yaw;
-    int dt=10;
+    float  m[3];
+    int r=10;
     
+    m[0]=-x*cos(yaw)-y*sin(yaw)+rz;
+    m[1]=-x*cos(yaw+(2*M_PI/3))+y*sin(yaw+(2*M_PI/3))+rz;
+    m[2]=x*cos(yaw+(M_PI/3))+y*sin(yaw+(M_PI/3))+rz
+    
+    /* 
     m[0]=(x*-cos(M_PI_4-th)+y*sin(M_PI_4-th)+L*z)*ad[0];
     m[1]=(x*cos(th+M_PI_4)+y*sin(th+M_PI_4)+L*z)*ad[1];
     m[2]=(x*cos(M_PI_4-th)+y*-sin(M_PI_4-th)+L*z)*ad[2];
     m[3]=(x*-cos(th+M_PI_4)+y*-sin(th+M_PI_4)+L*z)*ad[3];
+    */
     
-/*
-    m[0]=-x*sin(M_PI_4)+y*cos(M_PI_4)+r*z;
-    m[1]=-x*sin(-M_PI_4)+y*cos(-M_PI_4)+r*z;
-    m[2]=x*sin(M_PI_4)-y*cos(M_PI_4)+r*z;
-    m[3]=x*sin(-M_PI_4)-y*cos(-M_PI_4)+r*z;
-    
- */  
     if(m[0]>=0)m[0]=std::min(m[0],limit);
     else m[0]=std::max(m[0],-limit);
     if(m[1]>=0)m[1]=std::min(m[1],limit);
     else m[1]=std::max(m[1],-limit);
     if(m[2]>=0)m[2]=std::min(m[2],limit);
     else m[2]=std::max(m[2],-limit);
-    if(m[3]>=0)m[3]=std::min(m[3],limit);
-    else m[3]=std::max(m[3],-limit);
+    //if(m[3]>=0)m[3]=std::min(m[3],limit);
+    //else m[3]=std::max(m[3],-limit);
     
-    for(int i=0;i<4;i++)mtgo(i,m[i]);
+    for(int i=0;i<3;i++)mtgo(i,m[i]);
     
     ROS_INFO("m[0]%lf",m[0]);
     ROS_INFO("m[1]%lf",m[1]);
     ROS_INFO("m[2]%lf",m[2]);
-    ROS_INFO("m[3]%lf",m[3]);
+    //ROS_INFO("m[3]%lf",m[3]);
 
 }
 int main(int argc,char**argv){
     ros::init(argc,argv,"Omni");
     Omni omni;
-    ros::Rate loop_rate(10);
+    ros::Rate loop_rate(dt);
     while(ros::ok()){
         ros::spinOnce();
         loop_rate.sleep();

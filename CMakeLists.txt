@@ -219,8 +219,8 @@ include_directories(
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 
-add_executable(Omni src/Omni.cpp)
-target_link_libraries(Omni ${catkin_LIBRARIES})
+add_executable(Omni src/omni.cpp)
+target_link_libraries(omni ${catkin_LIBRARIES})
 
 
 
