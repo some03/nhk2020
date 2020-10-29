@@ -9,22 +9,17 @@ double k=0.1;
 double Lfc=2.0;
 double kp=1.0;
 double dt=0.1;
-double wb=2.9;//wheel base
-
+double wb=0.5;
 class State {
-    private:
-        State(double initx,double inity,double inityaw,double initv);
     public:
+        State(double initx,double inity,double inityaw,double initv);
         void update(double a,double delta);
         double calc_distance(double point_x,double point_y);
         double x,y,yaw,v;
         double rear_x,rear_y;
 };
 class Situation{
-    private:
-        Situation();
     public:
-
         std::vector<double>x;
         std::vector<double>y;
         std::vector<double>yaw;
@@ -36,9 +31,8 @@ class Situation{
 };
 
 class TargetCourse{
-    private:
-        TargetCourse(double *x,double *y,int num);
     public:
+        TargetCourse(std::vector<double>x,std::vector<double>y,int num);
         std::vector<double>cx;
         std::vector<double>cy;
         double search_target_index(State state);
@@ -60,14 +54,15 @@ State::State(double initx,double inity,double inityaw,double initv)
 }
 
 void State::update(double a,double delta){
-   this->x+=this->v*cos(this->yaw)*dt; 
-   this->y+=this->v*sin(this->yaw)*dt; 
-   this->yaw+=this->v/wb*tan(delta)*dt; 
+   this->x+=this->v*dt; 
+   this->y+=this->v*dt; 
+   this->yaw+=delta; 
 
    this->v+=a*dt;
 
     rear_x=this->x-((wb/2)*cos(yaw));
     rear_y=this->y-((wb/2)*sin(yaw));
+
 
 }
 double State::calc_distance(double point_x,double point_y){
@@ -80,7 +75,7 @@ double State::calc_distance(double point_x,double point_y){
 //-------------------------------------------------------------
 //situation---------------------------------------------------
 
-Situation::Situation(){;}
+//Situation::Situation(){;}
 
 void Situation::append(State state,double t){
     this->x.push_back(state.x);
@@ -93,7 +88,7 @@ void Situation::append(State state,double t){
 //-------------------------------------------------------------
 //targetcorse-------------------------------------------------
 
-TargetCourse::TargetCourse(double *x,double *y,int num){
+TargetCourse::TargetCourse(std::vector<double>x,std::vector<double>y,int num){
     for(int i=0;i<num;i++){
         cx.push_back(x[i]);
         cy.push_back(y[i]);
@@ -136,7 +131,7 @@ double TargetCourse::search_target_index(State state){
     double Lf=k*state.v+Lfc;
     while(Lf>state.calc_distance(cx[ind],cy[ind])){
                 if(ind+1>cx.size())break;
-                else ind++;
+                ind++;
             }
     return ind,Lf;
     
@@ -145,7 +140,10 @@ double TargetCourse::search_target_index(State state){
 
 //--------------------------------------------------------------
 
-
+double p_control(double target,double current){
+    double a=kp*(target-current);
+    return a;
+}
 
 double pursuit_control(State state, TargetCourse trajectory,double pind){
     int ind,Lf=trajectory.search_target_index(state);
@@ -161,7 +159,7 @@ double pursuit_control(State state, TargetCourse trajectory,double pind){
         ind=trajectory.cx.size()-1;
     }
     double alpha=atan2(ty-state.rear_y,tx-state.rear_x)-state.yaw;
-    double dist=hypot(ty-tx,state.rear_y-state.rear_x);
+    double dist=hypot(ty-state.rear_y,tx-state.rear_x);
 
     int relx=sin(alpha)*dist;
     int rely=cos(alpha)*dist;
