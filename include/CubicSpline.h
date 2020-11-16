@@ -21,6 +21,7 @@ class CubicSpline{
 };
 
 CubicSpline::CubicSpline(const vector<double>y){
+    std::cout<<"a";
     InitParameter(y);
 }
 void CubicSpline::InitParameter(const vector<double>y){

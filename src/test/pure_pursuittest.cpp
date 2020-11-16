@@ -1,18 +1,17 @@
 #include<vector>
-#include<../../include/pure_pursit.h>
+#include<../../include/Pure_pursuit.h>
 #include<../../include/matplotlib-cpp-starter/matplotlibcpp.h>
 #include<math.h>
 
 namespace plt=matplotlibcpp;
-#define show_animation
-
+/*
 void plot_arrow(auto x,auto y,auto yaw){
     double length=1.0;
     double width=0.5;
     char fc='r';
     char ec='k';
     
-   /* double state=dynamic_cast<double>(x);
+    double state=dynamic_cast<double>(x);
     
     
     if(state){
@@ -23,42 +22,63 @@ void plot_arrow(auto x,auto y,auto yaw){
         plt::prot(x,y);
         
     }
-    */
+    
 
 }
+*/
 
+std::vector<double> cx={1,2,3,4};
+std::vector<double> cy={1,2,3,4};
+
+double target_speed=10.0/3.6;
+
+double T=100.0;
+
+State state(0.0,0.0,0.0,0.0);
+double lastindex=4;
+double Time=0;
+
+double dt=0.5;
+
+TargetCourse target_couse(cx,cy,4);
+
+
+double nowx,nowy,nowyaw; 
+double relx,rely;
+int Target_ind=target_couse.search_target_index(state);//初期 
 int main(){
-    std::vector<double> cx={3,3.5,4,4.5};
-    std::vector<double> cy={0,2,3,1};
+    std::cout<<Target_ind;
 
-    double target_speed=10.0/3.6;
+    while(T>=Time && lastindex>Target_ind){
+       
+        relx,rely,Target_ind=pursuit_control(state,target_couse,Target_ind);
+        nowx+=0.1; 
+        nowy+=0.1; 
+        
+        state.update(nowx,nowy,nowyaw);
 
-    double T=100.0;
+        Time+=dt;
 
-    State state(0.0,0.0,0.0,0.0);
-    double lastindex=3;
-    double time=0;
+       // relx/=dt;
+       // rely/=dt;
 
-    Situation situation;
-
-    situation.append(state,time);
-    TargetCourse target_course(cx,cy,4);
-    int target_ind,_=target_course.search_target_index(state);
-
-    while(T>=time && lastindex>target_ind){
-        double ai=p_control(target_speed,state.v);
-        int di,target_ind=pursuit_control(state,target_course,target_ind);
-        state.update(ai,di);
-
-        time+=dt;
-        situation.append(state,time);
-
-        plt::named_plot("course",cx,cy,"-r");
-        plt::named_plot("trajectory",situation.x,situation.y,"-b");
-        plt::named_plot("target",cx,cy,"xg");
-        plt::pause(0.01);
-
+        std::cout<<"X:"<<relx<<std::endl;
+        std::cout<<"Y:"<<rely<<std::endl;
+        std::cout<<"ind:"<<Target_ind<<std::endl;
 
     }
+    relx=0.0;//停止
+    rely=0.0;
+
+
+/*
+        plt::named_plot("course",cx,cy,"-r");
+        //plt::named_plot("trajectory",situation.x,situation.y,"-b");
+        plt::named_plot("target",cx,cy,"xg");
+        plt::axis("equal");
+        plt::grid(true);
+        plt::pause(0.01);
+        
+   */ 
 
 }

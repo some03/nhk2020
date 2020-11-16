@@ -36,7 +36,7 @@ class TargetCourse{
         std::vector<double>cx;
         std::vector<double>cy;
         double search_target_index(State state);
-        int old_point_index=INT8_MAX;
+        int old_point_index;
         int ind;
 
 };
@@ -54,8 +54,8 @@ State::State(double initx,double inity,double inityaw,double initv)
 }
 
 void State::update(double a,double delta){
-   this->x+=this->v*dt; 
-   this->y+=this->v*dt; 
+   this->x+=this->v*cos(delta)*dt; 
+   this->y+=this->v*sin(delta)*dt; 
    this->yaw+=delta; 
 
    this->v+=a*dt;
@@ -94,6 +94,7 @@ TargetCourse::TargetCourse(std::vector<double>x,std::vector<double>y,int num){
         cy.push_back(y[i]);
     }
     
+        old_point_index=INT8_MAX;
 }
 
 double TargetCourse::search_target_index(State state){
@@ -109,14 +110,21 @@ double TargetCourse::search_target_index(State state){
            dy=state.rear_y-cy[i];
 
            d.push_back(hypot(dx,dy));
+
+            //std::cout<<d[i]<<std::endl;
        }
-       ind=*std::min_element(d.begin(),d.end());
-       old_point_index=ind;
+        std::vector<int>::iterator minIt=std::min_element(d.begin(),d.end());
+        ind=std::distance(d.begin(),minIt);
+        old_point_index=ind;
+
     }
 //-----------------------------------------------------
+
     else{
         ind=old_point_index;
+
         double distance_this_index=state.calc_distance(cx[ind],cy[ind]);
+        std::cout<<distance_this_index<<std::endl;
         while(true){
             double distance_next_index=state.calc_distance(cx[ind+1],cy[ind+1]);
 
@@ -128,11 +136,13 @@ double TargetCourse::search_target_index(State state){
         }
         old_point_index=ind;
     }
+
     double Lf=k*state.v+Lfc;
     while(Lf>state.calc_distance(cx[ind],cy[ind])){
                 if(ind+1>cx.size())break;
                 ind++;
             }
+            
     return ind,Lf;
     
 }
@@ -160,10 +170,10 @@ double pursuit_control(State state, TargetCourse trajectory,double pind){
     }
     double alpha=atan2(ty-state.rear_y,tx-state.rear_x)-state.yaw;
     double dist=hypot(ty-state.rear_y,tx-state.rear_x);
+   
+//    int relx=sin(alpha)*dist;
+//    int rely=cos(alpha)*dist;
 
-    int relx=sin(alpha)*dist;
-    int rely=cos(alpha)*dist;
-
-    return relx,rely;
+    return alpha,ind;
 }
 #endif
