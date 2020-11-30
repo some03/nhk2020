@@ -40,7 +40,7 @@ double Time=0;
 
 double dt=0.5;
 
-TargetCourse target_couse(cx,cy,4);
+TargetCourse target_couse(cx,cy);
 
 
 double nowx,nowy,nowyaw; 

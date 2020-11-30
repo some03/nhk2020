@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+        <meta charset="utf-8" />
+
+        <script src="three.js/build/three.min.js"></script>
+        <script src="three.js/examples/js/controls/OrbitControls.js"></script>
+        <script src="three.js/examples/js/controls/TrackballControls.js"></script>
+        <script>
+            // ページの読み込みを待つ
+            window.addEventListener('load', init);
+
+            function init() {
+            // サイズを指定
+
+                var width  = 800;
+                var height = 600;
+                var fov    = 60;
+                var aspect = width / height;
+                var near   = 1;
+                var far    = 10000;
+
+                const mouse=new THREE.Vector2();
+                // レンダラーを作成
+                const canvas=document.querySelector('#myCanvas');
+                const renderer = new THREE.WebGLRenderer({
+                canvas: canvas
+                });
+                renderer.setPixelRatio(window.devicePixelRatio);
+                renderer.setSize(width, height);
+
+                // シーンを作成
+                const scene = new THREE.Scene();
+
+                // カメラを作成
+
+                var camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+                camera.up.set(0,0,1);
+                camera.position.set( 60, 100, 50 );
+                camera.rotation.set( 0, 0, -0.4 );
+                controls= new THREE.OrbitControls(camera,renderer.domElement); 
+
+                // 地面を作成
+                const plane2 = new THREE.GridHelper(200,10);
+                plane2.rotateX(Math.PI/2);
+                scene.add(plane2);
+                const plane = new THREE.AxesHelper(300);
+                scene.add(plane);
+                const group = new THREE.Group();
+                scene.add(group);
+                let targetMesh = new THREE.Mesh();
+
+                const meshlist=[]; 
+
+            
+                const geometry = new THREE.PlaneGeometry( 200, 200, 10,10);
+                const material = new THREE.MeshBasicMaterial( {color: 0x696969, side: THREE.DoubleSide} );
+                const filed= new THREE.Mesh( geometry, material );
+                filed.position.set(0,0,-0.5);
+                //filed.rotation.x=Math.PI/2;
+                filed.name='field'
+                scene.add( filed);
+
+                meshlist.push(filed);
+
+
+
+                function renderLoop(){
+
+                    requestAnimationFrame(renderLoop);
+                    controls.update(renderer.domElement);
+                    renderer.render(scene, camera);
+                }
+
+                // get();
+            
+                renderLoop();
+
+                document.addEventListener('click',clickposition,true);
+
+                function clickposition(event){
+                    //const element=event.currentTarget;
+
+                    const x=event.clientX;
+                    const y=event.clientY;
+                    const w=event.offsetX;
+                    const h=event.offsetY;
+
+                    mouse.x=(x/window.innerWidth)*2-1;
+                    mouse.y=-(y/window.innerHeight)*2+1;
+                    
+                    
+                    console.log('x',mouse.x);
+                    console.log('y',mouse.y);
+                    get();
+                }
+
+                function get(){
+
+                    const raycaster=new THREE.Raycaster();
+                    raycaster.setFromCamera(mouse,camera);
+                    const intersects=raycaster.intersectObjects(meshlist);
+
+                    var material=new THREE.MeshBasicMaterial({color:0x66cdaa});
+                    var geometry=new THREE.CircleGeometry(3,6);
+                    var mesh=new THREE.Mesh(geometry,material);
+
+                    mesh.position.set(-100,0,0);
+                    scene.add(mesh); 
+                    renderer.render(scene,camera);
+                    console.log('x',intersects[0].point.x);
+                    console.log('y',intersects[0].point.y);
+                    console.log('z',intersects[0].point.z);
+
+
+                }
+
+            }
+
+
+        </script>
+    </head>
+    <body>
+        <canvas id="myCanvas"></canvas>
+    </body>
+</html>
